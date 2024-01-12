@@ -1,6 +1,8 @@
-# thevenin_norton
+# Thevenin Norton Solver
 
-Proyecto TFG
+Proyecto TFG Grado en Ingeniería informática. El objetivo es construir una aplicación de escritorio 
+que permita diseñar un circuito con una estructurá básica de ramas y calcular el circuito 
+equivalente aplicando el teorema de Thevenin-Norton. 
 
 ## Getting Started
 
