@@ -2,32 +2,60 @@ import 'package:flutter/material.dart';
 import 'package:thevenin_norton/painter/circuit_painter.dart';
 import 'package:thevenin_norton/painter/circuit_painter_2_meshes.dart';
 
-class DesignWindow extends StatelessWidget {
+import 'components/resistor.dart';
+
+class DesignWindow extends StatefulWidget {
   final int selectedMeshes;
 
-  DesignWindow({required this.selectedMeshes});
+  const DesignWindow({super.key, required this.selectedMeshes});
+
+  @override
+  _DesignWindowState createState() => _DesignWindowState();
+}
+
+class _DesignWindowState extends State<DesignWindow> {
+  List<Resistor> resistors = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Design Screen'),
+        title: const Text('Design Screen'),
       ),
-      body: Center(
-        child: CustomPaint(
-          size: Size(850,350),
-          painter: _getPainterForMeshes(selectedMeshes),
-        ),
+      body: Stack(
+        children: [
+          const Positioned(
+            top: 50,
+            left: 50,
+            child: DraggableResistor(), // The draggable resistor
+          ),
+          Center(
+            child: DragTarget<Resistor>(
+              onAccept: (resistor) {
+                setState(() {
+                  resistors.add(resistor); // Add the resistor to the circuit
+                });
+              },
+              builder: (context, candidateData, rejectedData) {
+                return CustomPaint(
+                  size: const Size(850, 350),
+                  painter: _getPainterForMeshes(meshes: widget.selectedMeshes, resistors: resistors)
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
-  
-  CustomPainter _getPainterForMeshes(int meshes) {
+
+  CustomPainter _getPainterForMeshes( {required int meshes,required List<Resistor> resistors}) {
     switch (meshes) {
       case 2:
-        return CircuitPainter2Meshes();
+        return CircuitPainter2Meshes(meshes: meshes, resistors: resistors);
       default:
         return CircuitPainter(meshes);
     }
   }
 }
+

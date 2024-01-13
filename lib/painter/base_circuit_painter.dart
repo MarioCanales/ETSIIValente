@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class BaseCircuitPainter extends CustomPainter {
+abstract class BaseCircuitPainter extends CustomPainter {
   final int meshes;
   BaseCircuitPainter(this.meshes);
 
