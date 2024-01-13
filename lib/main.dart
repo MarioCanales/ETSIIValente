@@ -63,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => DesginWindow(selectedMeshes: selectedMeshes),
+                          builder: (context) => DesignWindow(selectedMeshes: selectedMeshes),
                       ),
                   );
                 },

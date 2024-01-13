@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:thevenin_norton/painter/circuit_painter.dart';
+import 'package:thevenin_norton/painter/circuit_painter_2_meshes.dart';
 
-class DesginWindow extends StatelessWidget {
+class DesignWindow extends StatelessWidget {
   final int selectedMeshes;
 
-  DesginWindow({required this.selectedMeshes});
+  DesignWindow({required this.selectedMeshes});
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +16,18 @@ class DesginWindow extends StatelessWidget {
       body: Center(
         child: CustomPaint(
           size: Size(850,350),
-          painter: CircuitPainter(selectedMeshes),
+          painter: _getPainterForMeshes(selectedMeshes),
         ),
       ),
     );
+  }
+  
+  CustomPainter _getPainterForMeshes(int meshes) {
+    switch (meshes) {
+      case 2:
+        return CircuitPainter2Meshes();
+      default:
+        return CircuitPainter(meshes);
+    }
   }
 }
