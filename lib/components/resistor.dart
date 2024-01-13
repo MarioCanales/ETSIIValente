@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
-class Resistor {
-  double value = 1; // default value 1K
+import 'component.dart';
+
+class Resistor extends Component {
+  double value;
+  Resistor({Offset position = Offset.zero, this.value = 1.0}):
+        super(position: position);
 }
 
 class DraggableResistor extends StatelessWidget {
@@ -11,8 +15,7 @@ class DraggableResistor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Draggable<Resistor>(
-      data: Resistor()
-        ..value = 3, //Default to 3K ohms
+      data: Resistor(),//Default to 3K ohms
       feedback: const Material(
         type: MaterialType.transparency,
         child: ResistorWidget()

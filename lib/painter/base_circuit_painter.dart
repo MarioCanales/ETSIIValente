@@ -4,6 +4,11 @@ abstract class BaseCircuitPainter extends CustomPainter {
   final int meshes;
   BaseCircuitPainter(this.meshes);
 
+  late double left;
+  late double top;
+  late double right;
+  late double bottom;
+
   @override
   void paint(Canvas canvas, Size size) {
     var paint = Paint()
@@ -12,10 +17,7 @@ abstract class BaseCircuitPainter extends CustomPainter {
       ..strokeWidth = 3;
 
     // Drawing the outer rectangle
-    double left = (size.width - size.width * 0.8) / 2;
-    double top = (size.height - size.height * 0.6) / 2;
-    double right = left + size.width * 0.8;
-    double bottom = top + size.height * 0.6;
+    assignBorders(size);
     Rect rect = Rect.fromLTRB(left, top, right, bottom);
     canvas.drawRect(rect, paint);
 
@@ -27,6 +29,15 @@ abstract class BaseCircuitPainter extends CustomPainter {
     }
 
   }
+
+  void assignBorders(Size size) {
+    left = (size.width - size.width * 0.8) / 2;
+    top = (size.height - size.height * 0.6) / 2;
+    right = left + size.width * 0.8;
+    bottom = top + size.height * 0.6;
+  }
+
+
 
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
