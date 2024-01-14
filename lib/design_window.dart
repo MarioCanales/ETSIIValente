@@ -20,7 +20,6 @@ class _DesignWindowState extends State<DesignWindow> {
 
   @override
   Widget build(BuildContext context) {
-    BaseCircuitPainter painter = _getPainterForMeshes(meshes: widget.selectedMeshes, resistors: resistors);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Design Screen'),
