@@ -9,8 +9,7 @@ class Resistor extends Component {
 }
 
 class DraggableResistor extends StatelessWidget {
-  const DraggableResistor({super.key}); // key added for IDE recommendation.
-                                        // use is optional.
+  const DraggableResistor({super.key});
 
   @override
   Widget build(BuildContext context) {

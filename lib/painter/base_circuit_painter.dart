@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../components/resistor.dart';
+
 abstract class BaseCircuitPainter extends CustomPainter {
   final int meshes;
+
   BaseCircuitPainter(this.meshes);
 
   late double left;
@@ -43,4 +46,7 @@ abstract class BaseCircuitPainter extends CustomPainter {
   bool shouldRepaint(CustomPainter oldDelegate) {
     return false;
   }
+
+  // To be specified in each instance
+  bool isValidPosition(Offset offset);
 }

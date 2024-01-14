@@ -18,6 +18,10 @@ class Mesh {
   void _drawSegment(Paint paint, Canvas canvas, LineSegment segment) {
     canvas.drawLine(segment.start, segment.end, paint);
   }
+
+  bool isNearMesh(Offset offset) {
+    return low.isPointNear(offset, 100) || up.isPointNear(offset, 100) || up.isPointNear(offset, 100);
+  }
 }
 
 

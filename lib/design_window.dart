@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:thevenin_norton/painter/circuit_painter.dart';
+import 'package:thevenin_norton/painter/base_circuit_painter.dart';
 import 'package:thevenin_norton/painter/circuit_painter_2_meshes.dart';
+import 'package:thevenin_norton/painter/circuit_painter_3_meshes.dart';
+import 'package:thevenin_norton/painter/circuit_painter_4_meshes.dart';
 
 import 'components/resistor.dart';
 
@@ -18,6 +20,7 @@ class _DesignWindowState extends State<DesignWindow> {
 
   @override
   Widget build(BuildContext context) {
+    BaseCircuitPainter painter = _getPainterForMeshes(meshes: widget.selectedMeshes, resistors: resistors);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Design Screen'),
@@ -49,12 +52,14 @@ class _DesignWindowState extends State<DesignWindow> {
     );
   }
 
-  CustomPainter _getPainterForMeshes( {required int meshes,required List<Resistor> resistors}) {
+  BaseCircuitPainter _getPainterForMeshes( {required int meshes,required List<Resistor> resistors}) {
     switch (meshes) {
       case 2:
         return CircuitPainter2Meshes(meshes: meshes, resistors: resistors);
+      case 3:
+        return CircuitPainter3Meshes(meshes: meshes, resistors: resistors);
       default:
-        return CircuitPainter(meshes);
+        return CircuitPainter4Meshes(meshes: meshes, resistors: resistors);
     }
   }
 }
