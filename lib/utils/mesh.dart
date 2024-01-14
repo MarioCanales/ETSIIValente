@@ -20,7 +20,7 @@ class Mesh {
   }
 
   bool isNearMesh(Offset offset) {
-    return low.isPointNear(offset, 100) || up.isPointNear(offset, 100) || up.isPointNear(offset, 100);
+    return low.isPointNear(offset, 10) || up.isPointNear(offset, 10) || up.isPointNear(offset, 10);
   }
 }
 

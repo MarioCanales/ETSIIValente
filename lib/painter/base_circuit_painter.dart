@@ -47,6 +47,6 @@ abstract class BaseCircuitPainter extends CustomPainter {
     return false;
   }
 
-  // To be specified in each instance
+  // Logic TBD in each implementation
   bool isValidPosition(Offset offset);
 }
