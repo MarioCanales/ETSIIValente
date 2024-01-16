@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'component.dart';
+import 'electric_component.dart';
 
-class Resistor extends Component {
-  double value;
-  Resistor({Offset position = Offset.zero, this.value = 1.0}):
+class Resistor extends ElectricComponent {
+  double resistance;
+  Resistor({double position = 0, this.resistance = 1.0}):
         super(position: position);
 }
 
