@@ -10,9 +10,10 @@ class MeshSegmentCalculator {
       double right,
       double bottom)
   {
-    LineSegment low = LineSegment(Offset(right,bottom), Offset(left,bottom));
-    LineSegment vert = LineSegment(Offset(left,bottom), Offset(left,top));
-    LineSegment up = LineSegment(Offset(left,top), Offset(right,top));
-    return Mesh(low: low, vert: vert, up: up);
+    LineSegment bottomSegment = LineSegment(Offset(right,bottom), Offset(left,bottom));
+    LineSegment leftSegment = LineSegment(Offset(left,bottom), Offset(left,top));
+    LineSegment topSegment = LineSegment(Offset(left,top), Offset(right,top));
+    LineSegment rightSegment = LineSegment(Offset(right,top), Offset(right,bottom));
+    return Mesh(bottom: bottomSegment, left: leftSegment, top: topSegment, right: rightSegment);
   }
 }

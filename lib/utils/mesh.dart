@@ -3,16 +3,18 @@ import 'dart:ui';
 import 'line_segment.dart';
 
 class Mesh {
-  LineSegment low;
-  LineSegment vert;
-  LineSegment up;
+  LineSegment bottom;
+  LineSegment left;
+  LineSegment top;
+  LineSegment right;
 
-  Mesh({required this.low, required this.vert, required this.up});
+  Mesh({required this.bottom, required this.left, required this.top, required this.right});
 
   void drawMesh(Paint paint, Canvas canvas) {
-    _drawSegment(paint, canvas, low);
-    _drawSegment(paint, canvas, vert);
-    _drawSegment(paint, canvas, up);
+    _drawSegment(paint, canvas, bottom);
+    _drawSegment(paint, canvas, left);
+    _drawSegment(paint, canvas, top);
+    _drawSegment(paint, canvas, right);
   }
 
   void _drawSegment(Paint paint, Canvas canvas, LineSegment segment) {
@@ -20,7 +22,8 @@ class Mesh {
   }
 
   bool isNearMesh(Offset offset) {
-    return low.isPointNear(offset, 10) || up.isPointNear(offset, 10) || up.isPointNear(offset, 10);
+    return bottom.isPointNear(offset, 10) || left.isPointNear(offset, 10) ||
+        top.isPointNear(offset, 10) || right.isPointNear(offset, 10);
   }
 }
 
