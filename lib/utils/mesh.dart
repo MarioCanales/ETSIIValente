@@ -1,24 +1,20 @@
 import 'dart:ui';
 
-import 'line_segment.dart';
+import 'circuit_segment.dart';
 
 class Mesh {
-  LineSegment bottom;
-  LineSegment left;
-  LineSegment top;
-  LineSegment right;
+  CircuitSegment bottom;
+  CircuitSegment left;
+  CircuitSegment top;
+  CircuitSegment right;
 
   Mesh({required this.bottom, required this.left, required this.top, required this.right});
 
   void drawMesh(Paint paint, Canvas canvas) {
-    _drawSegment(paint, canvas, bottom);
-    _drawSegment(paint, canvas, left);
-    _drawSegment(paint, canvas, top);
-    _drawSegment(paint, canvas, right);
-  }
-
-  void _drawSegment(Paint paint, Canvas canvas, LineSegment segment) {
-    canvas.drawLine(segment.start, segment.end, paint);
+    bottom.draw(paint, canvas);
+    left.draw(paint, canvas);
+    top.draw(paint, canvas);
+    right.draw(paint, canvas);
   }
 
   bool isNearMesh(Offset offset) {

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:thevenin_norton/utils/line_segment.dart';
+import 'package:thevenin_norton/utils/circuit_segment.dart';
 import 'package:thevenin_norton/utils/mesh.dart';
 
 class MeshSegmentCalculator {
@@ -10,10 +10,10 @@ class MeshSegmentCalculator {
       double right,
       double bottom)
   {
-    LineSegment bottomSegment = LineSegment(Offset(right,bottom), Offset(left,bottom));
-    LineSegment leftSegment = LineSegment(Offset(left,bottom), Offset(left,top));
-    LineSegment topSegment = LineSegment(Offset(left,top), Offset(right,top));
-    LineSegment rightSegment = LineSegment(Offset(right,top), Offset(right,bottom));
+    CircuitSegment bottomSegment = CircuitSegment(Offset(right,bottom), Offset(left,bottom), List.empty());
+    CircuitSegment leftSegment = CircuitSegment(Offset(left,bottom), Offset(left,top), List.empty());
+    CircuitSegment topSegment = CircuitSegment(Offset(left,top), Offset(right,top), List.empty());
+    CircuitSegment rightSegment = CircuitSegment(Offset(right,top), Offset(right,bottom), List.empty());
     return Mesh(bottom: bottomSegment, left: leftSegment, top: topSegment, right: rightSegment);
   }
 }
