@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'electric_component.dart';
 
 class Resistor extends ElectricComponent {

@@ -1,10 +1,11 @@
-# Thevenin Norton Solver
+# ETSIIValente: Una aplicación para calcular circuitos equivalentes segun el teorema de Thevenin
 
-Proyecto TFG Grado en Ingeniería informática. El objetivo es construir una aplicación de escritorio 
-que permita diseñar un circuito con una estructurá básica de ramas y calcular el circuito 
-equivalente aplicando el teorema de Thevenin-Norton. 
+Proyecto TFG Grado en Ingeniería informática.
+Con este TFG se quiere diseñar e implementar una aplicación de escritorio capaz de calcular el 
+equivalente Thevenin de circuitos de corriente continua sencillos, similares a los que se estudian 
+y tratan en las asignaturas de Física de las diferentes titulaciones de la ETSII
 
-## Getting Started
+## Getting Started - Flutter
 
 This project is a starting point for a Flutter application.
 

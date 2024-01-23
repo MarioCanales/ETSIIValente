@@ -17,6 +17,12 @@ class Mesh {
     right.draw(paint, canvas);
   }
 
+  void drawRightMesh(Paint paint, Canvas canvas) {
+    bottom.draw(paint, canvas);
+    left.draw(paint, canvas);
+    top.draw(paint, canvas);
+  }
+
   bool isNearMesh(Offset offset) {
     return bottom.isPointNear(offset, 10) || left.isPointNear(offset, 10) ||
         top.isPointNear(offset, 10) || right.isPointNear(offset, 10);

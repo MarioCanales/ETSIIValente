@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../components/resistor.dart';
-
 abstract class BaseCircuitPainter extends CustomPainter {
   final int meshes;
 

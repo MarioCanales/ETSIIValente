@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:thevenin_norton/utils/circuit_segment.dart';
-import 'package:thevenin_norton/utils/mesh.dart';
+import 'circuit_segment.dart';
+import 'mesh.dart';
 
 class MeshSegmentCalculator {
   static Mesh calculateMesh(

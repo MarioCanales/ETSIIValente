@@ -17,12 +17,14 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen(),
+      home: const HomeScreen(),
     );
   }
 }
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -34,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Thevenin-Norton solver'),
+        title: const Text('Thevenin-Norton solver'),
       ),
       body: Center(
         child: Row(
@@ -56,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }).toList(),
             ),
             // Button to go
-            SizedBox(width: 20), // some spacing
+            const SizedBox(width: 20), // some spacing
             ElevatedButton(
                 onPressed: () {
                   print('Selected meshes: $selectedMeshes'); // Used to debug
@@ -67,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                   );
                 },
-                child: Text('Start designing'))
+                child: const Text('Start designing'))
           ],
         )
       ),

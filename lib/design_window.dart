@@ -1,8 +1,8 @@
+import 'package:ETSIIValente/painter/base_circuit_painter.dart';
+import 'package:ETSIIValente/painter/circuit_painter_2_meshes.dart';
+import 'package:ETSIIValente/painter/circuit_painter_3_meshes.dart';
+import 'package:ETSIIValente/painter/circuit_painter_4_meshes.dart';
 import 'package:flutter/material.dart';
-import 'package:thevenin_norton/painter/base_circuit_painter.dart';
-import 'package:thevenin_norton/painter/circuit_painter_2_meshes.dart';
-import 'package:thevenin_norton/painter/circuit_painter_3_meshes.dart';
-import 'package:thevenin_norton/painter/circuit_painter_4_meshes.dart';
 
 import 'components/resistor.dart';
 

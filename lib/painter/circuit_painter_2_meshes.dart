@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:thevenin_norton/painter/base_circuit_painter.dart';
-import 'package:thevenin_norton/utils/mesh_segment_calculator.dart';
 
 import '../components/resistor.dart';
 import '../utils/mesh.dart';
+import '../utils/mesh_segment_calculator.dart';
+import 'base_circuit_painter.dart';
 
 class CircuitPainter2Meshes extends BaseCircuitPainter {
 
@@ -29,7 +29,7 @@ class CircuitPainter2Meshes extends BaseCircuitPainter {
     mesh2 = MeshSegmentCalculator.calculateMesh(mid, top, right, bottom);
 
     mesh1.drawMesh(paint, canvas);
-    mesh2.drawMesh(paint, canvas);
+    mesh2.drawRightMesh(paint, canvas);
 
   }
 
