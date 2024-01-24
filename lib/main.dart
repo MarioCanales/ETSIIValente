@@ -9,70 +9,97 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Thevenin-Norton Solver',
+      title: 'ETSIIValente',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomeScreen(),
+      home: HomeScreen(),
     );
   }
 }
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  int selectedMeshes = 2;
-
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Thevenin-Norton solver'),
-      ),
-      body: Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            //Add DropdownButton
-            DropdownButton<int>(
-              value: selectedMeshes,
-              onChanged: (int? newValue) {
-                setState(() {
-                  selectedMeshes = newValue!;
-                });
-              },
-              items: [2,3,4].map<DropdownMenuItem<int>>((int value) {
-                return DropdownMenuItem<int>(
-                    value: value,
-                    child: Text('$value ramas')
-                );
-              }).toList(),
-            ),
-            // Button to go
-            const SizedBox(width: 20), // some spacing
-            ElevatedButton(
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          title: Row(
+            children: [
+              Image.asset('assets/logo_etsii.png',
+                  fit: BoxFit.cover, height: 60),
+              Expanded(
+                  child: Center(
+                    child: Text(
+                        'ETSIIValente', style: TextStyle(color: Colors.brown, fontSize: 30)
+                    ),
+                  )
+              ),
+              ElevatedButton(
                 onPressed: () {
-                  print('Selected meshes: $selectedMeshes'); // Used to debug
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DesignWindow(selectedMeshes: selectedMeshes),
-                      ),
-                  );
+                  // Action for saved circuits
                 },
-                child: const Text('Start designing'))
-          ],
-        )
-      ),
-    );
+                child: Text('Circuitos guardados',
+                    style: TextStyle(color: Colors.brown))
+              ),
+            ],
+          ),
+          toolbarHeight: 90
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage('assets/background.png'),
+                  fit: BoxFit.cover)),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  'Calcula el circuito equivalente Thevenin',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 44,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Elige la estructura, diseña, resuelve.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey),
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.brown),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.zero, // No rounded
+                      )
+                    )
+                  ),
+                  child: Text('Diseñar', style: TextStyle(color: Colors.white)),
+                  onPressed: () {
+                    // Navigate to design window
+                    // TODO: add the number o meshes selector here,from now
+                    // Navigating to a 3 meshes circuit
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => DesignWindow(selectedMeshes: 3)
+                      ),
+                    );
+                  },
+                )
+              ],
+            ),
+          ),
+        ));
   }
 }
