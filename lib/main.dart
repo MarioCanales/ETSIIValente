@@ -87,14 +87,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   child: Text('Diseñar', style: TextStyle(color: Colors.white)),
                   onPressed: () {
-                    // Navigate to design window
-                    // TODO: add the number o meshes selector here,from now
-                    // Navigating to a 3 meshes circuit
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => DesignWindow(selectedMeshes: 3)
-                      ),
-                    );
+                    _showMeshSelectionDialog(context);
                   },
                 )
               ],
@@ -102,4 +95,46 @@ class HomeScreen extends StatelessWidget {
           ),
         ));
   }
+
+  void _showMeshSelectionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Selecciona el número de mallas'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                GestureDetector(
+                  child: Text('2 Mallas'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => DesignWindow(selectedMeshes: 2)));
+                  },
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  child: Text('3 Mallas'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => DesignWindow(selectedMeshes: 3)));
+                  },
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  child: Text('4 Mallas'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => DesignWindow(selectedMeshes: 4)));
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
 }
