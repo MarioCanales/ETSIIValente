@@ -53,15 +53,12 @@ class _DesignWindowState extends State<DesignWindow> {
               ],
             ),
           ),
-          SizedBox(
-            width:
-                MediaQuery.of(context).size.width * 0.8, // 50% of screen width
-            height: MediaQuery.of(context).size.height *
-                0.5, // 30% of screen height,
-            child: CustomPaint(
-              painter: _getPainterForMeshes(
-                  meshes: widget.selectedMeshes, resistors: resistors),
-            ),
+          AspectRatio(
+              aspectRatio: 11 / 5,
+              child: CustomPaint(
+                painter: _getPainterForMeshes(
+                    meshes: widget.selectedMeshes, resistors: resistors),
+              ),
           )
         ],
       ),
