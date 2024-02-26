@@ -21,37 +21,55 @@ class _DesignWindowState extends State<DesignWindow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Design Screen'),
-      ),
-      body: Stack(
+      appBar: AppBar(title: const Text('Design Screen')),
+      body: Column(
         children: [
-          const Positioned(
-            top: 50,
-            left: 50,
-            child: DraggableResistor(), // The draggable resistor
-          ),
-          Center(
-            child: DragTarget<Resistor>(
-              onAccept: (resistor) {
-                setState(() {
-                  resistors.add(resistor); // Add the resistor to the circuit
-                });
-              },
-              builder: (context, candidateData, rejectedData) {
-                return CustomPaint(
-                  size: const Size(850, 350),
-                  painter: _getPainterForMeshes(meshes: widget.selectedMeshes, resistors: resistors)
-                );
-              },
+          Container(
+            color: Colors.white,
+            width: MediaQuery.of(context).size.width * 0.8,
+            height: MediaQuery.of(context).size.height * 0.1,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                    onTap: () {
+                      //TBD
+                    },
+                    child: Image.asset('assets/resistor.jpg',
+                        width: 40, height: 40)),
+                GestureDetector(
+                    onTap: () {
+                      //TBD
+                    },
+                    child: Image.asset('assets/voltajeFuente.png',
+                        width: 40, height: 40)),
+                GestureDetector(
+                  onTap: () {
+                    //TBD
+                  },
+                  child: Image.asset('assets/fuenteIntensidad.png',
+                      width: 40, height: 40),
+                )
+              ],
             ),
           ),
+          SizedBox(
+            width:
+                MediaQuery.of(context).size.width * 0.8, // 50% of screen width
+            height: MediaQuery.of(context).size.height *
+                0.5, // 30% of screen height,
+            child: CustomPaint(
+              painter: _getPainterForMeshes(
+                  meshes: widget.selectedMeshes, resistors: resistors),
+            ),
+          )
         ],
       ),
     );
   }
 
-  BaseCircuitPainter _getPainterForMeshes( {required int meshes,required List<Resistor> resistors}) {
+  BaseCircuitPainter _getPainterForMeshes(
+      {required int meshes, required List<Resistor> resistors}) {
     switch (meshes) {
       case 2:
         return CircuitPainter2Meshes(meshes: meshes, resistors: resistors);
@@ -62,4 +80,3 @@ class _DesignWindowState extends State<DesignWindow> {
     }
   }
 }
-

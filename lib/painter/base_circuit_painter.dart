@@ -32,10 +32,10 @@ abstract class BaseCircuitPainter extends CustomPainter {
   }
 
   void assignBorders(Size size) {
-    left = (size.width - size.width * 0.8) / 2;
-    top = (size.height - size.height * 0.6) / 2;
-    right = left + size.width * 0.8;
-    bottom = top + size.height * 0.6;
+    left = (size.width - size.width * 0.9) / 2;
+    top = (size.height - size.height * 0.7) / 2;
+    right = left + size.width * 0.9;
+    bottom = top + size.height * 0.7;
   }
 
 
