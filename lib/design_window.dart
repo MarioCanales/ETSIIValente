@@ -54,11 +54,11 @@ class _DesignWindowState extends State<DesignWindow> {
             ),
           ),
           AspectRatio(
-              aspectRatio: 11 / 5,
-              child: CustomPaint(
-                painter: _getPainterForMeshes(
-                    meshes: widget.selectedMeshes, resistors: resistors),
-              ),
+            aspectRatio: 11 / 5,
+            child: CustomPaint(
+              painter: _getPainterForMeshes(
+                  meshes: widget.selectedMeshes, resistors: resistors),
+            ),
           )
         ],
       ),

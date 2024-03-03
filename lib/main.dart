@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'circuit_designer.dart';
 import 'design_window.dart';
 
 void main() {
@@ -106,6 +107,14 @@ class HomeScreen extends StatelessWidget {
             child: ListBody(
               children: <Widget>[
                 GestureDetector(
+                  child: Text('2 Mallas - Test'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner()));
+                  },
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
                   child: Text('2 Mallas'),
                   onTap: () {
                     Navigator.of(context).pop();
@@ -136,5 +145,5 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-
 }
+
