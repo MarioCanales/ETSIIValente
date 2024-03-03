@@ -11,7 +11,7 @@ class CircuitDesigner extends StatefulWidget {
 class _CircuitDesignerState extends State<CircuitDesigner> {
   List<Resistor> resistors = [];
   final double borderWidth = 10; // Width of the border for tap detection
-  final double resistorRadius = 5;
+  final double resistorRadius = 10;
   final double circuitWidth = 800; // Fixed width for the circuit
   final double circuitHeight = 300; // Fixed height for the circuit
 
@@ -45,6 +45,42 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
   @override
   Widget build(BuildContext context) {
+
+    Offset _adjustResistorPosition(Offset tapPosition, Rect circuitRect) {
+      // Snap to the closest horizontal or vertical line within the circuit
+      double x = tapPosition.dx;
+      double y = tapPosition.dy;
+
+      // Check proximity to the left or right border (if it were included)
+      bool nearLeft = (x - circuitRect.left).abs() < borderWidth;
+      // bool nearRight = (x - circuitRect.right).abs() < borderWidth; // For future use if right border is included
+
+      // Check proximity to the top or bottom border
+      bool nearTop = (y - circuitRect.top).abs() < borderWidth;
+      bool nearBottom = (y - circuitRect.bottom).abs() < borderWidth;
+
+      // Adjust x, y to snap to the nearest line
+      if (nearLeft) {
+        x = circuitRect.left;
+      } /* else if (nearRight) {
+    x = circuitRect.right; // Uncomment if right border logic is included
+  }*/
+
+      if (nearTop) {
+        y = circuitRect.top;
+      } else if (nearBottom) {
+        y = circuitRect.bottom;
+      }
+
+      // For the middle line, adjust x to be the middle of the circuit
+      double middleX = circuitRect.left + (circuitRect.width / 2);
+      if ((tapPosition.dx - middleX).abs() < borderWidth) {
+        x = middleX;
+      }
+
+      return Offset(x, y);
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Electric Circuit Designer'),
@@ -54,9 +90,11 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
           Rect circuitRect = Rect.fromLTWH(
               90, 90, circuitWidth, circuitHeight);
           if (_isTapOnBorder(details.localPosition, circuitRect) && !_isTapOnResistor(details.localPosition)) {
+            Offset adjustedPosition = _adjustResistorPosition(details.localPosition, circuitRect);
             setState(() {
-              resistors.add(Resistor(details.localPosition));
+              resistors.add(Resistor(adjustedPosition));
             });
+
           }
         },
         child: Container(
@@ -118,7 +156,7 @@ class CircuitPainter extends CustomPainter {
     final resistorPaint = Paint()..color = Colors.blue;
 
     for (var resistor in resistors) {
-      canvas.drawCircle(resistor.position, 5, resistorPaint);
+      canvas.drawCircle(resistor.position, 10, resistorPaint);
     }
   }
 
@@ -126,3 +164,4 @@ class CircuitPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
+
