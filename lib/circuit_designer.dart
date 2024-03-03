@@ -1,6 +1,11 @@
+import 'dart:math';
 
 import 'package:flutter/material.dart';
-
+import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'components/resistor.dart';
 
 class CircuitDesigner extends StatefulWidget {
@@ -11,11 +16,31 @@ class CircuitDesigner extends StatefulWidget {
 class _CircuitDesignerState extends State<CircuitDesigner> {
   List<Resistor> resistors = [];
   final double borderWidth = 10; // Width of the border for tap detection
-  final double resistorRadius = 10;
+  final double resistorRadius = 40;
   final double circuitWidth = 800; // Fixed width for the circuit
   final double circuitHeight = 300; // Fixed height for the circuit
 
+
+  ui.Image? resistorImage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  Future<void> _loadImage() async {
+    final ByteData data = await rootBundle.load('assets/resistor.jpg');
+    final Uint8List bytes = data.buffer.asUint8List();
+    ui.decodeImageFromList(bytes, (ui.Image img) {
+      setState(() {
+        resistorImage = img;
+      });
+    });
+  }
+
   bool _isTapOnBorder(Offset tapPosition, Rect circuitRect) {
+
     // Modified checks for the border to exclude the right edge
     bool nearLeft = (tapPosition.dx - circuitRect.left).abs() < borderWidth;
     bool nearTopOrBottom =
@@ -51,9 +76,8 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
       double x = tapPosition.dx;
       double y = tapPosition.dy;
 
-      // Check proximity to the left or right border (if it were included)
+      // Check proximity to the left border
       bool nearLeft = (x - circuitRect.left).abs() < borderWidth;
-      // bool nearRight = (x - circuitRect.right).abs() < borderWidth; // For future use if right border is included
 
       // Check proximity to the top or bottom border
       bool nearTop = (y - circuitRect.top).abs() < borderWidth;
@@ -62,9 +86,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
       // Adjust x, y to snap to the nearest line
       if (nearLeft) {
         x = circuitRect.left;
-      } /* else if (nearRight) {
-    x = circuitRect.right; // Uncomment if right border logic is included
-  }*/
+      }
 
       if (nearTop) {
         y = circuitRect.top;
@@ -102,7 +124,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
           width: double.infinity,
           color: Colors.white,
           child: CustomPaint(
-            painter: CircuitPainter(resistors),
+            painter: CircuitPainter(resistors, resistorImage),
           ),
         ),
       ),
@@ -112,8 +134,9 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
 class CircuitPainter extends CustomPainter {
   final List<Resistor> resistors;
+  final ui.Image? resistorImage;
 
-  CircuitPainter(this.resistors);
+  CircuitPainter(this.resistors, this.resistorImage);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -152,16 +175,33 @@ class CircuitPainter extends CustomPainter {
     Offset endMiddleLine = Offset(middleX, circuitRect.bottom);
     canvas.drawLine(startMiddleLine, endMiddleLine, paint);
 
-    // Draw resistors as small circles on the circuit border
-    final resistorPaint = Paint()..color = Colors.blue;
+    // Draw the resistor image at each position
+    if (resistorImage != null) {
+      for (final resistor in resistors) {
+        const double imageWidth = 60.0;
+        const double imageHeight = 30.0;
+        // Calculate the destination rectangle for the image based on the position
+        Rect destRect = Rect.fromCenter(
+            center: resistor.position,
+            width: imageWidth,
+            height: imageHeight
+        );
 
-    for (var resistor in resistors) {
-      canvas.drawCircle(resistor.position, 10, resistorPaint);
+        // Translate and rotate the canvas if on a vertical line
+          // Draw the image
+          canvas.drawImageRect(
+            resistorImage!,
+            Rect.fromLTRB(0, 0, resistorImage!.width.toDouble(), resistorImage!.height.toDouble()),
+            destRect,
+            Paint(),
+          );
+      }
     }
   }
 
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+
 }
 
