@@ -12,6 +12,8 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   List<Resistor> resistors = [];
   final double borderWidth = 10; // Width of the border for tap detection
   final double resistorRadius = 5;
+  final double circuitWidth = 800; // Fixed width for the circuit
+  final double circuitHeight = 300; // Fixed height for the circuit
 
   bool _isTapOnBorder(Offset tapPosition, Rect circuitRect) {
     // Modified checks for the border to exclude the right edge
@@ -50,7 +52,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
       body: GestureDetector(
         onTapDown: (TapDownDetails details) {
           Rect circuitRect = Rect.fromLTWH(
-              50, 50, MediaQuery.of(context).size.width - 100, 200);
+              90, 90, circuitWidth, circuitHeight);
           if (_isTapOnBorder(details.localPosition, circuitRect) && !_isTapOnResistor(details.localPosition)) {
             setState(() {
               resistors.add(Resistor(details.localPosition));
@@ -58,7 +60,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
           }
         },
         child: Container(
-          height: 300,
+          height: 1300,
           width: double.infinity,
           color: Colors.white,
           child: CustomPaint(
@@ -83,7 +85,7 @@ class CircuitPainter extends CustomPainter {
       ..style = PaintingStyle.stroke; // Draw only the outline
 
     // Calculate the rectangle parameters
-    Rect circuitRect = Rect.fromLTWH(50, 50, size.width - 100, 200);
+    Rect circuitRect = Rect.fromLTWH(90, 90, 800, 300);
 
     // Draw the top line
     canvas.drawLine(
