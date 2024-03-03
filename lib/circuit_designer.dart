@@ -11,21 +11,34 @@ class CircuitDesigner extends StatefulWidget {
 class _CircuitDesignerState extends State<CircuitDesigner> {
   List<Resistor> resistors = [];
   final double borderWidth = 10; // Width of the border for tap detection
+  final double resistorRadius = 5;
 
   bool _isTapOnBorder(Offset tapPosition, Rect circuitRect) {
-    // Existing checks for the border
-    bool nearLeftOrRight =
-        (tapPosition.dx - circuitRect.left).abs() < borderWidth ||
-            (tapPosition.dx - circuitRect.right).abs() < borderWidth;
+    // Modified checks for the border to exclude the right edge
+    bool nearLeft = (tapPosition.dx - circuitRect.left).abs() < borderWidth;
     bool nearTopOrBottom =
         (tapPosition.dy - circuitRect.top).abs() < borderWidth ||
             (tapPosition.dy - circuitRect.bottom).abs() < borderWidth;
 
-    // Check for the middle line (now vertical)
+    // Check for the middle line
     double middleX = circuitRect.left + (circuitRect.width / 2);
     bool nearMiddleLine = (tapPosition.dx - middleX).abs() < borderWidth;
 
-    return nearLeftOrRight || nearTopOrBottom || nearMiddleLine;
+    bool toReturn = nearLeft || nearTopOrBottom || nearMiddleLine;
+    if (!toReturn) {
+      print("Touch outside the circuit");
+    }
+    return toReturn;
+  }
+
+  bool _isTapOnResistor(Offset tapPosition) {
+    for (var resistor in resistors) {
+      if ((tapPosition - resistor.position).distance < resistorRadius + borderWidth) {
+        print("Tap is too close to an existing resistor.");
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
@@ -38,7 +51,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
         onTapDown: (TapDownDetails details) {
           Rect circuitRect = Rect.fromLTWH(
               50, 50, MediaQuery.of(context).size.width - 100, 200);
-          if (_isTapOnBorder(details.localPosition, circuitRect)) {
+          if (_isTapOnBorder(details.localPosition, circuitRect) && !_isTapOnResistor(details.localPosition)) {
             setState(() {
               resistors.add(Resistor(details.localPosition));
             });
@@ -69,9 +82,29 @@ class CircuitPainter extends CustomPainter {
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke; // Draw only the outline
 
-    // Draw the outer rectangle
+    // Calculate the rectangle parameters
     Rect circuitRect = Rect.fromLTWH(50, 50, size.width - 100, 200);
-    canvas.drawRect(circuitRect, paint);
+
+    // Draw the top line
+    canvas.drawLine(
+      Offset(circuitRect.left, circuitRect.top),
+      Offset(circuitRect.right, circuitRect.top),
+      paint,
+    );
+
+    // Draw the bottom line
+    canvas.drawLine(
+      Offset(circuitRect.left, circuitRect.bottom),
+      Offset(circuitRect.right, circuitRect.bottom),
+      paint,
+    );
+
+    // Draw the left vertical line
+    canvas.drawLine(
+      Offset(circuitRect.left, circuitRect.top),
+      Offset(circuitRect.left, circuitRect.bottom),
+      paint,
+    );
 
     // Draw the subdividing line vertically in the middle
     double middleX = circuitRect.left + (circuitRect.width / 2);
@@ -81,10 +114,12 @@ class CircuitPainter extends CustomPainter {
 
     // Draw resistors as small circles on the circuit border
     final resistorPaint = Paint()..color = Colors.blue;
+
     for (var resistor in resistors) {
       canvas.drawCircle(resistor.position, 5, resistorPaint);
     }
   }
+
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
