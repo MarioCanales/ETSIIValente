@@ -178,23 +178,39 @@ class CircuitPainter extends CustomPainter {
     // Draw the resistor image at each position
     if (resistorImage != null) {
       for (final resistor in resistors) {
-        const double imageWidth = 60.0;
-        const double imageHeight = 30.0;
-        // Calculate the destination rectangle for the image based on the position
+        bool isVerticalLine = resistor.position.dx == 90 || // Left vertical line
+            resistor.position.dx == 90 + 800 / 2; // Middle vertical line
+
+        final double imageWidth = 60.0;
+        final double imageHeight = 30.0;
         Rect destRect = Rect.fromCenter(
-            center: resistor.position,
-            width: imageWidth,
-            height: imageHeight
+          center: resistor.position,
+          width: isVerticalLine ? imageHeight : imageWidth, // Swap dimensions if vertical
+          height: isVerticalLine ? imageWidth : imageHeight,
+        );
+        // Save the current canvas state
+        canvas.save();
+
+        // If the resistor is on a vertical line, apply rotation
+        if (isVerticalLine) {
+          // Translate to the resistor's position to set the pivot point for rotation
+          canvas.translate(resistor.position.dx, resistor.position.dy);
+          // Rotate 90 degrees (π/2 radians)
+          canvas.rotate(pi / 2);
+          // Translate back
+          canvas.translate(-resistor.position.dx, -resistor.position.dy);
+        }
+
+        // Draw the image
+        canvas.drawImageRect(
+          resistorImage!,
+          Rect.fromLTRB(0, 0, resistorImage!.width.toDouble(), resistorImage!.height.toDouble()),
+          destRect,
+          Paint(),
         );
 
-        // Translate and rotate the canvas if on a vertical line
-          // Draw the image
-          canvas.drawImageRect(
-            resistorImage!,
-            Rect.fromLTRB(0, 0, resistorImage!.width.toDouble(), resistorImage!.height.toDouble()),
-            destRect,
-            Paint(),
-          );
+        // Restore the canvas to the previous state
+        canvas.restore();
       }
     }
   }
