@@ -15,13 +15,13 @@ class CircuitDesigner extends StatefulWidget {
 
 class _CircuitDesignerState extends State<CircuitDesigner> {
   List<Resistor> resistors = [];
-  final double borderWidth = 10; // Width of the border for tap detection
-  final double resistorRadius = 40;
+  final double borderWidth =
+      10; // Width of the border for tap detection (tolerance)
+  final double resistorRadius = 40; // TODO: move to image width ?
   final double circuitWidth = 800; // Fixed width for the circuit
   final double circuitHeight = 300; // Fixed height for the circuit
 
-
-  ui.Image? resistorImage;
+  ui.Image? resistorImage; // Promise
 
   @override
   void initState() {
@@ -40,7 +40,6 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   }
 
   bool _isTapOnBorder(Offset tapPosition, Rect circuitRect) {
-
     // Modified checks for the border to exclude the right edge
     bool nearLeft = (tapPosition.dx - circuitRect.left).abs() < borderWidth;
     bool nearTopOrBottom =
@@ -60,7 +59,8 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
   bool _isTapOnResistor(Offset tapPosition) {
     for (var resistor in resistors) {
-      if ((tapPosition - resistor.position).distance < resistorRadius + borderWidth) {
+      if ((tapPosition - resistor.position).distance <
+          resistorRadius + borderWidth) {
         print("Tap is too close to an existing resistor.");
         return true;
       }
@@ -70,7 +70,6 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
   @override
   Widget build(BuildContext context) {
-
     Offset _adjustResistorPosition(Offset tapPosition, Rect circuitRect) {
       // Snap to the closest horizontal or vertical line within the circuit
       double x = tapPosition.dx;
@@ -109,14 +108,14 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
       ),
       body: GestureDetector(
         onTapDown: (TapDownDetails details) {
-          Rect circuitRect = Rect.fromLTWH(
-              90, 90, circuitWidth, circuitHeight);
-          if (_isTapOnBorder(details.localPosition, circuitRect) && !_isTapOnResistor(details.localPosition)) {
-            Offset adjustedPosition = _adjustResistorPosition(details.localPosition, circuitRect);
+          Rect circuitRect = Rect.fromLTWH(90, 90, circuitWidth, circuitHeight);
+          if (_isTapOnBorder(details.localPosition, circuitRect) &&
+              !_isTapOnResistor(details.localPosition)) {
+            Offset adjustedPosition =
+                _adjustResistorPosition(details.localPosition, circuitRect);
             setState(() {
               resistors.add(Resistor(adjustedPosition));
             });
-
           }
         },
         child: Container(
@@ -146,6 +145,7 @@ class CircuitPainter extends CustomPainter {
       ..style = PaintingStyle.stroke; // Draw only the outline
 
     // Calculate the rectangle parameters
+    // TODO: move to constants? calculate it in a separate method?
     Rect circuitRect = Rect.fromLTWH(90, 90, 800, 300);
 
     // Draw the top line
@@ -178,14 +178,17 @@ class CircuitPainter extends CustomPainter {
     // Draw the resistor image at each position
     if (resistorImage != null) {
       for (final resistor in resistors) {
-        bool isVerticalLine = resistor.position.dx == 90 || // Left vertical line
-            resistor.position.dx == 90 + 800 / 2; // Middle vertical line
+        bool isVerticalLine =
+            resistor.position.dx == 90 || // Left vertical line
+                resistor.position.dx == 90 + 800 / 2; // Middle vertical line
 
         final double imageWidth = 60.0;
         final double imageHeight = 30.0;
         Rect destRect = Rect.fromCenter(
           center: resistor.position,
-          width: isVerticalLine ? imageHeight : imageWidth, // Swap dimensions if vertical
+          width: isVerticalLine
+              ? imageHeight
+              : imageWidth, // Swap dimensions if vertical
           height: isVerticalLine ? imageWidth : imageHeight,
         );
         // Save the current canvas state
@@ -204,7 +207,8 @@ class CircuitPainter extends CustomPainter {
         // Draw the image
         canvas.drawImageRect(
           resistorImage!,
-          Rect.fromLTRB(0, 0, resistorImage!.width.toDouble(), resistorImage!.height.toDouble()),
+          Rect.fromLTRB(0, 0, resistorImage!.width.toDouble(),
+              resistorImage!.height.toDouble()),
           destRect,
           Paint(),
         );
@@ -215,9 +219,6 @@ class CircuitPainter extends CustomPainter {
     }
   }
 
-
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-
 }
-
