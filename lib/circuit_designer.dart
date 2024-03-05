@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'components/resistor.dart';
+import 'components/voltage_source.dart';
+
+enum Component { resistor, voltageSource}
 
 class CircuitDesigner extends StatefulWidget {
   @override
@@ -15,26 +17,42 @@ class CircuitDesigner extends StatefulWidget {
 
 class _CircuitDesignerState extends State<CircuitDesigner> {
   List<Resistor> resistors = [];
+  List<VoltageSource> voltageSource = [];
+  Component selectedComponent = Component.resistor;
+  // Circuit params
   final double borderWidth =
       10; // Width of the border for tap detection (tolerance)
   final double resistorRadius = 40; // TODO: move to image width ?
   final double circuitWidth = 800; // Fixed width for the circuit
   final double circuitHeight = 300; // Fixed height for the circuit
 
-  ui.Image? resistorImage; // Promise
+  // Images
+  ui.Image? resistorImage;
+  ui.Image? voltageSourceImage;
 
   @override
   void initState() {
     super.initState();
-    _loadImage();
+    _loadResistorImage();
+    _loadVoltageSourceImage();
   }
 
-  Future<void> _loadImage() async {
+  Future<void> _loadResistorImage() async {
     final ByteData data = await rootBundle.load('assets/resistor.jpg');
     final Uint8List bytes = data.buffer.asUint8List();
     ui.decodeImageFromList(bytes, (ui.Image img) {
       setState(() {
         resistorImage = img;
+      });
+    });
+  }
+
+  Future<void> _loadVoltageSourceImage() async {
+    final ByteData data = await rootBundle.load('assets/voltajeFuente.png');
+    final Uint8List bytes = data.buffer.asUint8List();
+    ui.decodeImageFromList(bytes, (ui.Image img) {
+      setState(() {
+        voltageSourceImage = img;
       });
     });
   }
@@ -104,7 +122,21 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Electric Circuit Designer'),
+        title: const Text('Diseña tu circuito'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.electrical_services),
+            onPressed: () => setState(() {
+              selectedComponent = Component.resistor;
+            }),
+          ),
+          IconButton(
+            icon: Icon(Icons.battery_charging_full),
+            onPressed: () => setState(() {
+              selectedComponent = Component.voltageSource;
+            }),
+          ),
+        ],
       ),
       body: GestureDetector(
         onTapDown: (TapDownDetails details) {
@@ -114,7 +146,11 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
             Offset adjustedPosition =
                 _adjustResistorPosition(details.localPosition, circuitRect);
             setState(() {
-              resistors.add(Resistor(adjustedPosition));
+              if(selectedComponent == Component.resistor) {
+                resistors.add(Resistor(adjustedPosition));
+              } else {
+                voltageSource.add(VoltageSource(adjustedPosition));
+              }
             });
           }
         },
@@ -123,7 +159,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
           width: double.infinity,
           color: Colors.white,
           child: CustomPaint(
-            painter: CircuitPainter(resistors, resistorImage),
+            painter: CircuitPainter(resistors, voltageSource, resistorImage, voltageSourceImage),
           ),
         ),
       ),
@@ -133,9 +169,11 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
 class CircuitPainter extends CustomPainter {
   final List<Resistor> resistors;
+  final List<VoltageSource> voltageSources;
   final ui.Image? resistorImage;
+  final ui.Image? voltageSourceImage;
 
-  CircuitPainter(this.resistors, this.resistorImage);
+  CircuitPainter(this.resistors, this.voltageSources, this.resistorImage, this.voltageSourceImage);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -207,6 +245,49 @@ class CircuitPainter extends CustomPainter {
         // Draw the image
         canvas.drawImageRect(
           resistorImage!,
+          Rect.fromLTRB(0, 0, resistorImage!.width.toDouble(),
+              resistorImage!.height.toDouble()),
+          destRect,
+          Paint(),
+        );
+
+        // Restore the canvas to the previous state
+        canvas.restore();
+      }
+    }
+
+    // TODO: refactor -> extract common logic into a method
+    if (voltageSourceImage != null) {
+      for (final source in voltageSources) {
+        bool isVerticalLine =
+            source.position.dx == 90 || // Left vertical line
+                source.position.dx == 90 + 800 / 2; // Middle vertical line
+
+        final double imageWidth = 60.0;
+        final double imageHeight = 30.0;
+        Rect destRect = Rect.fromCenter(
+          center: source.position,
+          width: isVerticalLine
+              ? imageHeight
+              : imageWidth, // Swap dimensions if vertical
+          height: isVerticalLine ? imageWidth : imageHeight,
+        );
+        // Save the current canvas state
+        canvas.save();
+
+        // If the resistor is on a vertical line, apply rotation
+        if (isVerticalLine) {
+          // Translate to the resistor's position to set the pivot point for rotation
+          canvas.translate(source.position.dx, source.position.dy);
+          // Rotate 90 degrees (π/2 radians)
+          canvas.rotate(pi / 2);
+          // Translate back
+          canvas.translate(-source.position.dx, -source.position.dy);
+        }
+
+        // Draw the image
+        canvas.drawImageRect(
+          voltageSourceImage!,
           Rect.fromLTRB(0, 0, resistorImage!.width.toDouble(),
               resistorImage!.height.toDouble()),
           destRect,
