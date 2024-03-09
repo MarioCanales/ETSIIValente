@@ -21,6 +21,9 @@ class CircuitParameters {
   static const double componentRange = 40.0;
   static const double circuitWidth = 800.0;
   static const double circuitHeight = 300.0;
+  static const double circuitPadding = 90.0;
+  static const double imageWidth = 60.0;
+  static const double imageHeight = 30.0;
 }
 
 class _CircuitDesignerState extends State<CircuitDesigner> {
@@ -172,7 +175,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
           Expanded(
               child: GestureDetector(
                 onTapDown: (TapDownDetails details) {
-                  Rect circuitRect = Rect.fromLTWH(90, 90, CircuitParameters.circuitWidth, CircuitParameters.circuitHeight);
+                  Rect circuitRect = const Rect.fromLTWH(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding, CircuitParameters.circuitWidth, CircuitParameters.circuitHeight);
                   if (_isTapOnBorder(details.localPosition, circuitRect) &&
                       !_isTapOnComponent(details.localPosition)) {
                     _addComponentAtPosition(details, circuitRect);
@@ -211,9 +214,7 @@ class CircuitPainter extends CustomPainter {
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke; // Draw only the outline
 
-    // Calculate the rectangle parameters
-    // TODO: move to constants? calculate it in a separate method?
-    Rect circuitRect = Rect.fromLTWH(90, 90, 800, 300);
+    Rect circuitRect = const Rect.fromLTWH(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding, CircuitParameters.circuitWidth, CircuitParameters.circuitHeight);
 
     // Draw the top line
     canvas.drawLine(
@@ -244,132 +245,42 @@ class CircuitPainter extends CustomPainter {
 
     // Draw the resistor image at each position
     if (resistorImage != null) {
-      for (final resistor in resistors) {
-        bool isVerticalLine =
-            resistor.position.dx == 90 || // Left vertical line
-                resistor.position.dx == 90 + 800 / 2; // Middle vertical line
-
-        final double imageWidth = 60.0;
-        final double imageHeight = 30.0;
-        Rect destRect = Rect.fromCenter(
-          center: resistor.position,
-          width: isVerticalLine
-              ? imageHeight
-              : imageWidth, // Swap dimensions if vertical
-          height: isVerticalLine ? imageWidth : imageHeight,
-        );
-        // Save the current canvas state
-        canvas.save();
-
-        // If the resistor is on a vertical line, apply rotation
-        if (isVerticalLine) {
-          // Translate to the resistor's position to set the pivot point for rotation
-          canvas.translate(resistor.position.dx, resistor.position.dy);
-          // Rotate 90 degrees (π/2 radians)
-          canvas.rotate(pi / 2);
-          // Translate back
-          canvas.translate(-resistor.position.dx, -resistor.position.dy);
-        }
-
-        // Draw the image
-        canvas.drawImageRect(
-          resistorImage!,
-          Rect.fromLTRB(0, 0, resistorImage!.width.toDouble(),
-              resistorImage!.height.toDouble()),
-          destRect,
-          Paint(),
-        );
-
-        // Restore the canvas to the previous state
-        canvas.restore();
-      }
+      resistors.forEach((resistor) => _drawComponent(canvas, resistorImage!, resistor.position));
+      voltageSources.forEach((source) => _drawComponent(canvas, voltageSourceImage!, source.position));
+      currentSources.forEach((source) => _drawComponent(canvas, currentSourceImage!, source.position));
     }
+  }
 
-    // TODO: refactor -> extract common logic into a method
-    if (voltageSourceImage != null) {
-      for (final source in voltageSources) {
-        bool isVerticalLine =
-            source.position.dx == 90 || // Left vertical line
-                source.position.dx == 90 + 800 / 2; // Middle vertical line
+  void _drawComponent(Canvas canvas, ui.Image image, Offset position) {
+    bool isVerticalLine =
+        position.dx == CircuitParameters.circuitPadding || // Left vertical line
+            position.dx == CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2;
 
-        final double imageWidth = 60.0;
-        final double imageHeight = 30.0;
-        Rect destRect = Rect.fromCenter(
-          center: source.position,
-          width: isVerticalLine
-              ? imageHeight
-              : imageWidth, // Swap dimensions if vertical
-          height: isVerticalLine ? imageWidth : imageHeight,
-        );
-        // Save the current canvas state
-        canvas.save();
+    Rect destRect = Rect.fromCenter(
+      center: position,
+      width: isVerticalLine
+          ? CircuitParameters.imageHeight
+          : CircuitParameters.imageWidth, // Swap dimensions if vertical
+      height: isVerticalLine ? CircuitParameters.imageWidth : CircuitParameters.imageHeight,
+    );
+    canvas.save();
 
-        // If the resistor is on a vertical line, apply rotation
-        if (isVerticalLine) {
-          // Translate to the resistor's position to set the pivot point for rotation
-          canvas.translate(source.position.dx, source.position.dy);
-          // Rotate 90 degrees (π/2 radians)
-          canvas.rotate(pi / 2);
-          // Translate back
-          canvas.translate(-source.position.dx, -source.position.dy);
-        }
-
-        // Draw the image
-        canvas.drawImageRect(
-          voltageSourceImage!,
-          Rect.fromLTRB(0, 0, voltageSourceImage!.width.toDouble(),
-              voltageSourceImage!.height.toDouble()),
-          destRect,
-          Paint(),
-        );
-
-        // Restore the canvas to the previous state
-        canvas.restore();
-      }
+    // If the resistor is on a vertical line, apply rotation
+    if (isVerticalLine) {
+      canvas.translate(position.dx, position.dy);
+      canvas.rotate(pi / 2);
+      canvas.translate(-position.dx, -position.dy);
     }
-
-    // TODO: refactor -> extract common logic into a method
-    if (currentSourceImage != null) {
-      for (final source in currentSources) {
-        bool isVerticalLine =
-            source.position.dx == 90 || // Left vertical line
-                source.position.dx == 90 + 800 / 2; // Middle vertical line
-
-        final double imageWidth = 60.0;
-        final double imageHeight = 30.0;
-        Rect destRect = Rect.fromCenter(
-          center: source.position,
-          width: isVerticalLine
-              ? imageHeight
-              : imageWidth, // Swap dimensions if vertical
-          height: isVerticalLine ? imageWidth : imageHeight,
-        );
-        // Save the current canvas state
-        canvas.save();
-
-        // If the resistor is on a vertical line, apply rotation
-        if (isVerticalLine) {
-          // Translate to the resistor's position to set the pivot point for rotation
-          canvas.translate(source.position.dx, source.position.dy);
-          // Rotate 90 degrees (π/2 radians)
-          canvas.rotate(pi / 2);
-          // Translate back
-          canvas.translate(-source.position.dx, -source.position.dy);
-        }
-
-        // Draw the image
-        canvas.drawImageRect(
-          currentSourceImage!,
-          Rect.fromLTRB(0, 0, currentSourceImage!.width.toDouble(),
-              currentSourceImage!.height.toDouble()),
-          destRect,
-          Paint(),
-        );
-
-        // Restore the canvas to the previous state
-        canvas.restore();
-      }
-    }
+    // Draw the image
+    canvas.drawImageRect(
+      image,
+      Rect.fromLTRB(0, 0, image.width.toDouble(),
+          image.height.toDouble()),
+      destRect,
+      Paint(),
+    );
+    // Restore the canvas to the previous state
+    canvas.restore();
   }
 
   @override
