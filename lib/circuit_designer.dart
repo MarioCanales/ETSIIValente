@@ -89,17 +89,6 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     return toReturn;
   }
 
-  bool _isTapOnResistor(Offset tapPosition) {
-    for (var resistor in resistors) {
-      if ((tapPosition - resistor.position).distance <
-          resistorRadius + borderWidth) {
-        print("Tap is too close to an existing resistor.");
-        return true;
-      }
-    }
-    return false;
-  }
-
   bool _isTapOnComponent(Offset tapPosition) {
     bool toReturn = false;
     for (var resistor in resistors) {
