@@ -16,17 +16,18 @@ class CircuitDesigner extends StatefulWidget {
   _CircuitDesignerState createState() => _CircuitDesignerState();
 }
 
+class CircuitParameters {
+  static const double tolerance = 10.0;
+  static const double componentRange = 40.0;
+  static const double circuitWidth = 800.0;
+  static const double circuitHeight = 300.0;
+}
+
 class _CircuitDesignerState extends State<CircuitDesigner> {
   List<Resistor> resistors = [];
   List<VoltageSource> voltageSources = [];
   List<CurrentSource> currentSources = [];
   Component selectedComponent = Component.resistor;
-  // Circuit params
-  final double borderWidth =
-      10; // Width of the border for tap detection (tolerance)
-  final double resistorRadius = 40; // TODO: move to image width ?
-  final double circuitWidth = 800; // Fixed width for the circuit
-  final double circuitHeight = 300; // Fixed height for the circuit
 
   // Images
   ui.Image? resistorImage;
@@ -73,14 +74,14 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
   bool _isTapOnBorder(Offset tapPosition, Rect circuitRect) {
     // Modified checks for the border to exclude the right edge
-    bool nearLeft = (tapPosition.dx - circuitRect.left).abs() < borderWidth;
+    bool nearLeft = (tapPosition.dx - circuitRect.left).abs() < CircuitParameters.tolerance;
     bool nearTopOrBottom =
-        (tapPosition.dy - circuitRect.top).abs() < borderWidth ||
-            (tapPosition.dy - circuitRect.bottom).abs() < borderWidth;
+        (tapPosition.dy - circuitRect.top).abs() < CircuitParameters.tolerance ||
+            (tapPosition.dy - circuitRect.bottom).abs() < CircuitParameters.tolerance;
 
     // Check for the middle line
     double middleX = circuitRect.left + (circuitRect.width / 2);
-    bool nearMiddleLine = (tapPosition.dx - middleX).abs() < borderWidth;
+    bool nearMiddleLine = (tapPosition.dx - middleX).abs() < CircuitParameters.tolerance;
 
     bool toReturn = nearLeft || nearTopOrBottom || nearMiddleLine;
     if (!toReturn) {
@@ -93,21 +94,21 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     bool toReturn = false;
     for (var resistor in resistors) {
       if ((tapPosition - resistor.position).distance <
-          resistorRadius + borderWidth) {
+          CircuitParameters.componentRange + CircuitParameters.tolerance) {
         print("Tap is too close to an existing resistor.");
         return true;
       }
     }
     for (var source in voltageSources) {
       if ((tapPosition - source.position).distance <
-          resistorRadius + borderWidth) {
+          CircuitParameters.componentRange + CircuitParameters.tolerance) {
         print("Tap is too close to an existing voltage source.");
         return true;
       }
     }
     for (var source in currentSources) {
       if ((tapPosition - source.position).distance <
-          resistorRadius + borderWidth) {
+          CircuitParameters.componentRange + CircuitParameters.tolerance) {
         print("Tap is too close to an existing current source.");
         return true;
       }
@@ -122,11 +123,11 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
       double y = tapPosition.dy;
 
       // Check proximity to the left border
-      bool nearLeft = (x - circuitRect.left).abs() < borderWidth;
+      bool nearLeft = (x - circuitRect.left).abs() < CircuitParameters.tolerance;
 
       // Check proximity to the top or bottom border
-      bool nearTop = (y - circuitRect.top).abs() < borderWidth;
-      bool nearBottom = (y - circuitRect.bottom).abs() < borderWidth;
+      bool nearTop = (y - circuitRect.top).abs() < CircuitParameters.tolerance;
+      bool nearBottom = (y - circuitRect.bottom).abs() < CircuitParameters.tolerance;
 
       // Adjust x, y to snap to the nearest line
       if (nearLeft) {
@@ -141,7 +142,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
       // For the middle line, adjust x to be the middle of the circuit
       double middleX = circuitRect.left + (circuitRect.width / 2);
-      if ((tapPosition.dx - middleX).abs() < borderWidth) {
+      if ((tapPosition.dx - middleX).abs() < CircuitParameters.tolerance) {
         x = middleX;
       }
 
@@ -180,7 +181,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
           Expanded(
               child: GestureDetector(
                 onTapDown: (TapDownDetails details) {
-                  Rect circuitRect = Rect.fromLTWH(90, 90, circuitWidth, circuitHeight);
+                  Rect circuitRect = Rect.fromLTWH(90, 90, CircuitParameters.circuitWidth, CircuitParameters.circuitHeight);
                   if (_isTapOnBorder(details.localPosition, circuitRect) &&
                       !_isTapOnComponent(details.localPosition)) {
                     Offset adjustedPosition =
