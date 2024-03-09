@@ -37,39 +37,15 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   @override
   void initState() {
     super.initState();
-    _loadResistorImage();
-    _loadVoltageSourceImage();
-    _loadCurrentSourceImage();
+    _loadImage('assets/resistor.jpg', (img) => setState(() => resistorImage = img));
+    _loadImage('assets/voltajeFuente.png', (img) => setState(() => voltageSourceImage = img));
+    _loadImage('assets/fuenteIntensidad.png', (img) => setState(() => currentSourceImage = img));
   }
 
-  Future<void> _loadResistorImage() async {
-    final ByteData data = await rootBundle.load('assets/resistor.jpg');
+  Future<void> _loadImage(String assetPath, Function(ui.Image) callback) async {
+    final ByteData data = await rootBundle.load(assetPath);
     final Uint8List bytes = data.buffer.asUint8List();
-    ui.decodeImageFromList(bytes, (ui.Image img) {
-      setState(() {
-        resistorImage = img;
-      });
-    });
-  }
-
-  Future<void> _loadVoltageSourceImage() async {
-    final ByteData data = await rootBundle.load('assets/voltajeFuente.png');
-    final Uint8List bytes = data.buffer.asUint8List();
-    ui.decodeImageFromList(bytes, (ui.Image img) {
-      setState(() {
-        voltageSourceImage = img;
-      });
-    });
-  }
-
-  Future<void> _loadCurrentSourceImage() async {
-    final ByteData data = await rootBundle.load('assets/fuenteIntensidad.png');
-    final Uint8List bytes = data.buffer.asUint8List();
-    ui.decodeImageFromList(bytes, (ui.Image img) {
-      setState(() {
-        currentSourceImage = img;
-      });
-    });
+    ui.decodeImageFromList(bytes, callback);
   }
 
   bool _isTapOnBorder(Offset tapPosition, Rect circuitRect) {
@@ -115,40 +91,55 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     }
     return toReturn;
   }
-  @override
-  Widget build(BuildContext context) {
-    Offset _adjustResistorPosition(Offset tapPosition, Rect circuitRect) {
-      // Snap to the closest horizontal or vertical line within the circuit
-      double x = tapPosition.dx;
-      double y = tapPosition.dy;
 
-      // Check proximity to the left border
-      bool nearLeft = (x - circuitRect.left).abs() < CircuitParameters.tolerance;
+  Offset _adjustResistorPosition(Offset tapPosition, Rect circuitRect) {
+    // Snap to the closest horizontal or vertical line within the circuit
+    double x = tapPosition.dx;
+    double y = tapPosition.dy;
 
-      // Check proximity to the top or bottom border
-      bool nearTop = (y - circuitRect.top).abs() < CircuitParameters.tolerance;
-      bool nearBottom = (y - circuitRect.bottom).abs() < CircuitParameters.tolerance;
+    // Check proximity to the left border
+    bool nearLeft = (x - circuitRect.left).abs() < CircuitParameters.tolerance;
 
-      // Adjust x, y to snap to the nearest line
-      if (nearLeft) {
-        x = circuitRect.left;
-      }
+    // Check proximity to the top or bottom border
+    bool nearTop = (y - circuitRect.top).abs() < CircuitParameters.tolerance;
+    bool nearBottom = (y - circuitRect.bottom).abs() < CircuitParameters.tolerance;
 
-      if (nearTop) {
-        y = circuitRect.top;
-      } else if (nearBottom) {
-        y = circuitRect.bottom;
-      }
-
-      // For the middle line, adjust x to be the middle of the circuit
-      double middleX = circuitRect.left + (circuitRect.width / 2);
-      if ((tapPosition.dx - middleX).abs() < CircuitParameters.tolerance) {
-        x = middleX;
-      }
-
-      return Offset(x, y);
+    // Adjust x, y to snap to the nearest line
+    if (nearLeft) {
+      x = circuitRect.left;
     }
 
+    if (nearTop) {
+      y = circuitRect.top;
+    } else if (nearBottom) {
+      y = circuitRect.bottom;
+    }
+
+    // For the middle line, adjust x to be the middle of the circuit
+    double middleX = circuitRect.left + (circuitRect.width / 2);
+    if ((tapPosition.dx - middleX).abs() < CircuitParameters.tolerance) {
+      x = middleX;
+    }
+
+    return Offset(x, y);
+  }
+
+  void _addComponentAtPosition(TapDownDetails details, Rect circuitRect) {
+    Offset adjustedPosition =
+    _adjustResistorPosition(details.localPosition, circuitRect);
+    setState(() {
+      if (selectedComponent == Component.resistor) {
+        resistors.add(Resistor(adjustedPosition));
+      } else if (selectedComponent == Component.voltageSource) {
+        voltageSources.add(VoltageSource(adjustedPosition));
+      } else {
+        currentSources.add(CurrentSource(adjustedPosition));
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Diseña tu circuito'),
@@ -184,17 +175,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
                   Rect circuitRect = Rect.fromLTWH(90, 90, CircuitParameters.circuitWidth, CircuitParameters.circuitHeight);
                   if (_isTapOnBorder(details.localPosition, circuitRect) &&
                       !_isTapOnComponent(details.localPosition)) {
-                    Offset adjustedPosition =
-                    _adjustResistorPosition(details.localPosition, circuitRect);
-                    setState(() {
-                      if (selectedComponent == Component.resistor) {
-                        resistors.add(Resistor(adjustedPosition));
-                      } else if (selectedComponent == Component.voltageSource) {
-                        voltageSources.add(VoltageSource(adjustedPosition));
-                      } else {
-                        currentSources.add(CurrentSource(adjustedPosition));
-                      }
-                    });
+                    _addComponentAtPosition(details, circuitRect);
                   }
                 },
                 child: Container(
