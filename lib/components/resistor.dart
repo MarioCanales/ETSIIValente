@@ -2,5 +2,6 @@ import 'dart:ui';
 
 class Resistor {
   Offset position;
-  Resistor(this.position);
+  double resistance;
+  Resistor(this.position, this.resistance);
 }

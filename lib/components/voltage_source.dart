@@ -3,5 +3,6 @@ import 'dart:ui';
 
 class VoltageSource {
   Offset position;
-  VoltageSource(this.position);
+  double voltage;
+  VoltageSource(this.position, this.voltage);
 }

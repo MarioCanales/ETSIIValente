@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'components/resistor.dart';
 import 'components/voltage_source.dart';
 
-enum Component { resistor, voltageSource, currentSource}
+enum Component { resistor, voltageSource, currentSource }
 
 class CircuitDesigner extends StatefulWidget {
   @override
@@ -40,9 +40,12 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   @override
   void initState() {
     super.initState();
-    _loadImage('assets/resistor.jpg', (img) => setState(() => resistorImage = img));
-    _loadImage('assets/voltajeFuente.png', (img) => setState(() => voltageSourceImage = img));
-    _loadImage('assets/fuenteIntensidad.png', (img) => setState(() => currentSourceImage = img));
+    _loadImage(
+        'assets/resistor.jpg', (img) => setState(() => resistorImage = img));
+    _loadImage('assets/voltajeFuente.png',
+        (img) => setState(() => voltageSourceImage = img));
+    _loadImage('assets/fuenteIntensidad.png',
+        (img) => setState(() => currentSourceImage = img));
   }
 
   Future<void> _loadImage(String assetPath, Function(ui.Image) callback) async {
@@ -53,14 +56,17 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
   bool _isTapOnBorder(Offset tapPosition, Rect circuitRect) {
     // Modified checks for the border to exclude the right edge
-    bool nearLeft = (tapPosition.dx - circuitRect.left).abs() < CircuitParameters.tolerance;
-    bool nearTopOrBottom =
-        (tapPosition.dy - circuitRect.top).abs() < CircuitParameters.tolerance ||
-            (tapPosition.dy - circuitRect.bottom).abs() < CircuitParameters.tolerance;
+    bool nearLeft =
+        (tapPosition.dx - circuitRect.left).abs() < CircuitParameters.tolerance;
+    bool nearTopOrBottom = (tapPosition.dy - circuitRect.top).abs() <
+            CircuitParameters.tolerance ||
+        (tapPosition.dy - circuitRect.bottom).abs() <
+            CircuitParameters.tolerance;
 
     // Check for the middle line
     double middleX = circuitRect.left + (circuitRect.width / 2);
-    bool nearMiddleLine = (tapPosition.dx - middleX).abs() < CircuitParameters.tolerance;
+    bool nearMiddleLine =
+        (tapPosition.dx - middleX).abs() < CircuitParameters.tolerance;
 
     bool toReturn = nearLeft || nearTopOrBottom || nearMiddleLine;
     if (!toReturn) {
@@ -105,7 +111,8 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
     // Check proximity to the top or bottom border
     bool nearTop = (y - circuitRect.top).abs() < CircuitParameters.tolerance;
-    bool nearBottom = (y - circuitRect.bottom).abs() < CircuitParameters.tolerance;
+    bool nearBottom =
+        (y - circuitRect.bottom).abs() < CircuitParameters.tolerance;
 
     // Adjust x, y to snap to the nearest line
     if (nearLeft) {
@@ -127,55 +134,94 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     return Offset(x, y);
   }
 
-  void _addComponentAtPosition(TapDownDetails details, Rect circuitRect) {
-    Offset adjustedPosition =
-    _adjustResistorPosition(details.localPosition, circuitRect);
+  void _addComponentAtPosition(TapDownDetails details, Rect circuitRect) async {
+    Offset adjustedPosition = _adjustResistorPosition(details.localPosition, circuitRect);
+
+    // Determine the type of component and prompt for the respective value
+    String valueType = "";
+    if (selectedComponent == Component.resistor) {
+      valueType = "Introduce la resistencia (KΩ)";
+    } else if (selectedComponent == Component.voltageSource) {
+      valueType = "Introduce el voltaje (V)";
+    } else if (selectedComponent == Component.currentSource) {
+      valueType = "Introduce la intensidad (A)";
+    }
+
+    // Show dialog to enter value
+    final TextEditingController controller = TextEditingController();
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Enter $valueType'),
+            content: TextField(
+              controller: controller,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+
+    double value = double.tryParse(controller.text) ?? 0; // Default to 0 if parsing fails
+
     setState(() {
       if (selectedComponent == Component.resistor) {
-        resistors.add(Resistor(adjustedPosition));
+        resistors.add(Resistor(adjustedPosition, value));
       } else if (selectedComponent == Component.voltageSource) {
-        voltageSources.add(VoltageSource(adjustedPosition));
-      } else {
-        currentSources.add(CurrentSource(adjustedPosition));
+        voltageSources.add(VoltageSource(adjustedPosition, value));
+      } else if (selectedComponent == Component.currentSource) {
+        currentSources.add(CurrentSource(adjustedPosition, value));
       }
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Diseña tu circuito'),
-      ),
-      body: Column(
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.electrical_services),
-                onPressed: () => setState(() {
-                  selectedComponent = Component.resistor;
-                }),
-              ),
-              IconButton(
-                icon: Icon(Icons.battery_charging_full),
-                onPressed: () => setState(() {
-                  selectedComponent = Component.voltageSource;
-                }),
-              ),
-              IconButton(
-                icon: Icon(Icons.bike_scooter),
-                onPressed: () => setState(() {
-                  selectedComponent = Component.currentSource;
-                }),
-              )
-            ],
-          ),
-          Expanded(
+        appBar: AppBar(
+          title: const Text('Diseña tu circuito'),
+        ),
+        body: Column(
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.electrical_services),
+                  onPressed: () => setState(() {
+                    selectedComponent = Component.resistor;
+                  }),
+                ),
+                IconButton(
+                  icon: Icon(Icons.battery_charging_full),
+                  onPressed: () => setState(() {
+                    selectedComponent = Component.voltageSource;
+                  }),
+                ),
+                IconButton(
+                  icon: Icon(Icons.bike_scooter),
+                  onPressed: () => setState(() {
+                    selectedComponent = Component.currentSource;
+                  }),
+                )
+              ],
+            ),
+            Expanded(
               child: GestureDetector(
                 onTapDown: (TapDownDetails details) {
-                  Rect circuitRect = const Rect.fromLTWH(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding, CircuitParameters.circuitWidth, CircuitParameters.circuitHeight);
+                  Rect circuitRect = const Rect.fromLTWH(
+                      CircuitParameters.circuitPadding,
+                      CircuitParameters.circuitPadding,
+                      CircuitParameters.circuitWidth,
+                      CircuitParameters.circuitHeight);
                   if (_isTapOnBorder(details.localPosition, circuitRect) &&
                       !_isTapOnComponent(details.localPosition)) {
                     _addComponentAtPosition(details, circuitRect);
@@ -186,14 +232,19 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
                   width: double.infinity,
                   color: Colors.white,
                   child: CustomPaint(
-                    painter: CircuitPainter(resistors, voltageSources, currentSources, resistorImage, voltageSourceImage, currentSourceImage),
+                    painter: CircuitPainter(
+                        resistors,
+                        voltageSources,
+                        currentSources,
+                        resistorImage,
+                        voltageSourceImage,
+                        currentSourceImage),
                   ),
                 ),
               ),
-          )
-        ],
-      )
-    );
+            )
+          ],
+        ));
   }
 }
 
@@ -205,7 +256,8 @@ class CircuitPainter extends CustomPainter {
   final ui.Image? voltageSourceImage;
   final ui.Image? currentSourceImage;
 
-  CircuitPainter(this.resistors, this.voltageSources, this.currentSources, this.resistorImage, this.voltageSourceImage, this.currentSourceImage);
+  CircuitPainter(this.resistors, this.voltageSources, this.currentSources,
+      this.resistorImage, this.voltageSourceImage, this.currentSourceImage);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -214,7 +266,11 @@ class CircuitPainter extends CustomPainter {
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke; // Draw only the outline
 
-    Rect circuitRect = const Rect.fromLTWH(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding, CircuitParameters.circuitWidth, CircuitParameters.circuitHeight);
+    Rect circuitRect = const Rect.fromLTWH(
+        CircuitParameters.circuitPadding,
+        CircuitParameters.circuitPadding,
+        CircuitParameters.circuitWidth,
+        CircuitParameters.circuitHeight);
 
     // Draw the top line
     canvas.drawLine(
@@ -245,23 +301,30 @@ class CircuitPainter extends CustomPainter {
 
     // Draw the resistor image at each position
     if (resistorImage != null) {
-      resistors.forEach((resistor) => _drawComponent(canvas, resistorImage!, resistor.position));
-      voltageSources.forEach((source) => _drawComponent(canvas, voltageSourceImage!, source.position));
-      currentSources.forEach((source) => _drawComponent(canvas, currentSourceImage!, source.position));
+      resistors.forEach((resistor) =>
+          _drawComponent(canvas, resistorImage!, resistor.position));
+      voltageSources.forEach((source) =>
+          _drawComponent(canvas, voltageSourceImage!, source.position));
+      currentSources.forEach((source) =>
+          _drawComponent(canvas, currentSourceImage!, source.position));
     }
   }
 
   void _drawComponent(Canvas canvas, ui.Image image, Offset position) {
     bool isVerticalLine =
         position.dx == CircuitParameters.circuitPadding || // Left vertical line
-            position.dx == CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2;
+            position.dx ==
+                CircuitParameters.circuitPadding +
+                    CircuitParameters.circuitWidth / 2;
 
     Rect destRect = Rect.fromCenter(
       center: position,
       width: isVerticalLine
           ? CircuitParameters.imageHeight
           : CircuitParameters.imageWidth, // Swap dimensions if vertical
-      height: isVerticalLine ? CircuitParameters.imageWidth : CircuitParameters.imageHeight,
+      height: isVerticalLine
+          ? CircuitParameters.imageWidth
+          : CircuitParameters.imageHeight,
     );
     canvas.save();
 
@@ -274,8 +337,7 @@ class CircuitPainter extends CustomPainter {
     // Draw the image
     canvas.drawImageRect(
       image,
-      Rect.fromLTRB(0, 0, image.width.toDouble(),
-          image.height.toDouble()),
+      Rect.fromLTRB(0, 0, image.width.toDouble(), image.height.toDouble()),
       destRect,
       Paint(),
     );
