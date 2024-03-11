@@ -136,31 +136,28 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
   void _addComponentAtPosition(TapDownDetails details, Rect circuitRect) async {
     Offset adjustedPosition = _adjustResistorPosition(details.localPosition, circuitRect);
+    TextEditingController valueController = TextEditingController();
 
-    // Determine the type of component and prompt for the respective value
-    String valueType = "";
-    if (selectedComponent == Component.resistor) {
-      valueType = "Introduce la resistencia (KΩ)";
-    } else if (selectedComponent == Component.voltageSource) {
-      valueType = "Introduce el voltaje (V)";
-    } else if (selectedComponent == Component.currentSource) {
-      valueType = "Introduce la intensidad (A)";
-    }
-
-    // Show dialog to enter value
-    final TextEditingController controller = TextEditingController();
+    // Show dialog to get the value
     await showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Enter $valueType'),
+            title: Text("Enter Value"),
             content: TextField(
-              controller: controller,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              controller: valueController,
+              decoration: InputDecoration(
+                hintText: selectedComponent == Component.resistor
+                    ? "Resistance (Ohms)"
+                    : selectedComponent == Component.voltageSource
+                    ? "Voltage (Volts)"
+                    : "Current (Amperes)",
+              ),
+              keyboardType: TextInputType.number,
             ),
             actions: <Widget>[
               TextButton(
-                child: Text('OK'),
+                child: Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -169,18 +166,20 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
           );
         });
 
-    double value = double.tryParse(controller.text) ?? 0; // Default to 0 if parsing fails
+    double value = double.tryParse(valueController.text) ?? 0.0; // Default to 0 if parse fails
 
+    // Add component with value
     setState(() {
       if (selectedComponent == Component.resistor) {
         resistors.add(Resistor(adjustedPosition, value));
       } else if (selectedComponent == Component.voltageSource) {
         voltageSources.add(VoltageSource(adjustedPosition, value));
-      } else if (selectedComponent == Component.currentSource) {
+      } else {
         currentSources.add(CurrentSource(adjustedPosition, value));
       }
     });
   }
+
 
 
   @override
@@ -302,15 +301,15 @@ class CircuitPainter extends CustomPainter {
     // Draw the resistor image at each position
     if (resistorImage != null) {
       resistors.forEach((resistor) =>
-          _drawComponent(canvas, resistorImage!, resistor.position));
+          _drawComponent(canvas, resistorImage!, resistor.position, resistor.resistance, Component.resistor));
       voltageSources.forEach((source) =>
-          _drawComponent(canvas, voltageSourceImage!, source.position));
+          _drawComponent(canvas, voltageSourceImage!, source.position, source.voltage, Component.voltageSource));
       currentSources.forEach((source) =>
-          _drawComponent(canvas, currentSourceImage!, source.position));
+          _drawComponent(canvas, currentSourceImage!, source.position, source.current, Component.currentSource));
     }
   }
 
-  void _drawComponent(Canvas canvas, ui.Image image, Offset position) {
+  void _drawComponent(Canvas canvas, ui.Image image, Offset position, double value, Component selectedComponent) {
     bool isVerticalLine =
         position.dx == CircuitParameters.circuitPadding || // Left vertical line
             position.dx ==
@@ -342,6 +341,19 @@ class CircuitPainter extends CustomPainter {
       Paint(),
     );
     // Restore the canvas to the previous state
+    // Draw the value text above the component
+    // Create a text painter to draw the value
+    TextSpan span = new TextSpan(style: new TextStyle(color: Colors.black), text: value.toString() + (selectedComponent == Component.resistor ? "Ω" : selectedComponent == Component.voltageSource ? "V" : "A")); // You might want to customize the unit based on the component type
+    TextPainter tp = new TextPainter(text: span, textAlign: TextAlign.center, textDirection: TextDirection.ltr);
+    tp.layout();
+    // Calculate the offset to center the text above the component
+    // Subtract half the text width from the component's center position
+    double textX = position.dx - (tp.width / 2);
+    // Adjust the y position to move the text above the component, modifying the offset as needed
+    double textY = position.dy - CircuitParameters.imageHeight - tp.height; // You may need to adjust this based on your component size
+    // Paint the text
+    tp.paint(canvas, Offset(textX, textY));
+
     canvas.restore();
   }
 
