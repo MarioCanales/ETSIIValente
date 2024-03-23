@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:ETSIIValente/components/CircuitLine.dart';
 import 'package:ETSIIValente/components/current_source.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -24,6 +25,39 @@ class CircuitParameters {
   static const double circuitPadding = 90.0;
   static const double imageWidth = 60.0;
   static const double imageHeight = 30.0;
+
+  static List<CircuitLine> CircuitLines  = [
+      // Top left line
+      CircuitLine(
+        const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
+        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding),
+      ),
+      // Top right line
+      CircuitLine(
+        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding),
+        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth, CircuitParameters.circuitPadding),
+      ),
+      // Bottom left line
+      CircuitLine(
+        const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      ),
+      // Bottom right line
+      CircuitLine(
+        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      ),
+      // Left vertical line
+      CircuitLine(
+        const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
+        const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      ),
+      // Middle vertical line
+      CircuitLine(
+        const Offset(CircuitParameters.circuitPadding + (CircuitParameters.circuitWidth / 2), CircuitParameters.circuitPadding),
+        const Offset(CircuitParameters.circuitPadding + (CircuitParameters.circuitWidth / 2), CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      ),
+    ];
 }
 
 class _CircuitDesignerState extends State<CircuitDesigner> {
@@ -54,25 +88,15 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     ui.decodeImageFromList(bytes, callback);
   }
 
-  bool _isTapOnBorder(Offset tapPosition, Rect circuitRect) {
-    // Modified checks for the border to exclude the right edge
-    bool nearLeft =
-        (tapPosition.dx - circuitRect.left).abs() < CircuitParameters.tolerance;
-    bool nearTopOrBottom = (tapPosition.dy - circuitRect.top).abs() <
-            CircuitParameters.tolerance ||
-        (tapPosition.dy - circuitRect.bottom).abs() <
-            CircuitParameters.tolerance;
-
-    // Check for the middle line
-    double middleX = circuitRect.left + (circuitRect.width / 2);
-    bool nearMiddleLine =
-        (tapPosition.dx - middleX).abs() < CircuitParameters.tolerance;
-
-    bool toReturn = nearLeft || nearTopOrBottom || nearMiddleLine;
-    if (!toReturn) {
-      print("Touch outside the circuit");
+  bool _isTapOnBorder(Offset tapPosition) {
+    // First iteration: check all
+    for (CircuitLine line in CircuitParameters.CircuitLines) {
+      if (line.distanceToPoint(tapPosition) < CircuitParameters.tolerance) {
+        return true; // Tap is close to this line
+      }
     }
-    return toReturn;
+    print("Touch outside the circuit");
+    return false; // No line is close enough to the tap position
   }
 
   bool _isTapOnComponent(Offset tapPosition) {
@@ -101,41 +125,36 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     return toReturn;
   }
 
-  Offset _adjustResistorPosition(Offset tapPosition, Rect circuitRect) {
-    // Snap to the closest horizontal or vertical line within the circuit
-    double x = tapPosition.dx;
-    double y = tapPosition.dy;
+  Offset _adjustComponentPosition(Offset tapPosition) {
+    List<CircuitLine> circuitLines = CircuitParameters.CircuitLines;
+    CircuitLine? closestLine;
+    double closestDistance = double.infinity;
 
-    // Check proximity to the left border
-    bool nearLeft = (x - circuitRect.left).abs() < CircuitParameters.tolerance;
-
-    // Check proximity to the top or bottom border
-    bool nearTop = (y - circuitRect.top).abs() < CircuitParameters.tolerance;
-    bool nearBottom =
-        (y - circuitRect.bottom).abs() < CircuitParameters.tolerance;
-
-    // Adjust x, y to snap to the nearest line
-    if (nearLeft) {
-      x = circuitRect.left;
+    for (CircuitLine line in circuitLines) {
+      double distance = line.distanceToPoint(tapPosition);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestLine = line;
+      }
     }
 
-    if (nearTop) {
-      y = circuitRect.top;
-    } else if (nearBottom) {
-      y = circuitRect.bottom;
+    if (closestLine != null) {
+      // Adjust tapPosition to be on the closestLine
+      // For horizontal lines, adjust y; for vertical lines, adjust x
+      if (closestLine.start.dy == closestLine.end.dy) {
+        // Line is horizontal
+        return Offset(tapPosition.dx, closestLine.start.dy);
+      } else {
+        // Line is vertical
+        return Offset(closestLine.start.dx, tapPosition.dy);
+      }
     }
 
-    // For the middle line, adjust x to be the middle of the circuit
-    double middleX = circuitRect.left + (circuitRect.width / 2);
-    if ((tapPosition.dx - middleX).abs() < CircuitParameters.tolerance) {
-      x = middleX;
-    }
-
-    return Offset(x, y);
+    return tapPosition; // Return original position if no line is close enough
   }
 
-  void _addComponentAtPosition(TapDownDetails details, Rect circuitRect) async {
-    Offset adjustedPosition = _adjustResistorPosition(details.localPosition, circuitRect);
+  void _addComponentAtPosition(TapDownDetails details) async {
+    Offset adjustedPosition = _adjustComponentPosition(details.localPosition);
     TextEditingController valueController = TextEditingController();
 
     // Show dialog to get the value
@@ -216,14 +235,9 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
             Expanded(
               child: GestureDetector(
                 onTapDown: (TapDownDetails details) {
-                  Rect circuitRect = const Rect.fromLTWH(
-                      CircuitParameters.circuitPadding,
-                      CircuitParameters.circuitPadding,
-                      CircuitParameters.circuitWidth,
-                      CircuitParameters.circuitHeight);
-                  if (_isTapOnBorder(details.localPosition, circuitRect) &&
+                  if (_isTapOnBorder(details.localPosition) &&
                       !_isTapOnComponent(details.localPosition)) {
-                    _addComponentAtPosition(details, circuitRect);
+                    _addComponentAtPosition(details);
                   }
                 },
                 child: Container(
@@ -265,39 +279,12 @@ class CircuitPainter extends CustomPainter {
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke; // Draw only the outline
 
-    Rect circuitRect = const Rect.fromLTWH(
-        CircuitParameters.circuitPadding,
-        CircuitParameters.circuitPadding,
-        CircuitParameters.circuitWidth,
-        CircuitParameters.circuitHeight);
-
-    // Draw the top line
-    canvas.drawLine(
-      Offset(circuitRect.left, circuitRect.top),
-      Offset(circuitRect.right, circuitRect.top),
-      paint,
-    );
-
-    // Draw the bottom line
-    canvas.drawLine(
-      Offset(circuitRect.left, circuitRect.bottom),
-      Offset(circuitRect.right, circuitRect.bottom),
-      paint,
-    );
-
-    // Draw the left vertical line
-    canvas.drawLine(
-      Offset(circuitRect.left, circuitRect.top),
-      Offset(circuitRect.left, circuitRect.bottom),
-      paint,
-    );
-
-    // Draw the subdividing line vertically in the middle
-    double middleX = circuitRect.left + (circuitRect.width / 2);
-    Offset startMiddleLine = Offset(middleX, circuitRect.top);
-    Offset endMiddleLine = Offset(middleX, circuitRect.bottom);
-    canvas.drawLine(startMiddleLine, endMiddleLine, paint);
-
+    // Define Lines of the circuit
+    List<CircuitLine> lines = CircuitParameters.CircuitLines;
+    // Draw each line
+    for (var line in lines) {
+      line.draw(canvas, paint);
+    }
     // Draw the resistor image at each position
     if (resistorImage != null) {
       resistors.forEach((resistor) =>
