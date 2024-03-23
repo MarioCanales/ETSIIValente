@@ -7,6 +7,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
+import 'components/CircuitMesh.dart';
 import 'components/resistor.dart';
 import 'components/voltage_source.dart';
 
@@ -26,37 +27,56 @@ class CircuitParameters {
   static const double imageWidth = 60.0;
   static const double imageHeight = 30.0;
 
+  // Structuring mesh numbers according to Alfonso doc
+  // (available on TFG documentation)
+
+  static List<CircuitLine> CircuitLineMesh1 = [
+    // Top right line
+    CircuitLine(
+      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding),
+      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth, CircuitParameters.circuitPadding),
+    )
+  ];
+
+  static List<CircuitLine> CircuitLineMesh2 = [
+    // Bottom right line
+    CircuitLine(
+      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+    )
+  ];
+
+  static List<CircuitLine> CircuitLinesMesh3 = [
+    // Middle vertical line
+    CircuitLine(
+      const Offset(CircuitParameters.circuitPadding + (CircuitParameters.circuitWidth / 2), CircuitParameters.circuitPadding),
+      const Offset(CircuitParameters.circuitPadding + (CircuitParameters.circuitWidth / 2), CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+    )
+  ];
+
+  static List<CircuitLine> CircuitLinesMesh4 = [
+    // Top left line
+    CircuitLine(
+      const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
+      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding),
+    ),
+    // Bottom left line
+    CircuitLine(
+      const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+    ),
+    // Left vertical line
+    CircuitLine(
+      const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
+      const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+    ),
+  ];
+
   static List<CircuitLine> CircuitLines  = [
-      // Top left line
-      CircuitLine(
-        const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
-        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding),
-      ),
-      // Top right line
-      CircuitLine(
-        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding),
-        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth, CircuitParameters.circuitPadding),
-      ),
-      // Bottom left line
-      CircuitLine(
-        const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
-        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
-      ),
-      // Bottom right line
-      CircuitLine(
-        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
-        const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
-      ),
-      // Left vertical line
-      CircuitLine(
-        const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
-        const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
-      ),
-      // Middle vertical line
-      CircuitLine(
-        const Offset(CircuitParameters.circuitPadding + (CircuitParameters.circuitWidth / 2), CircuitParameters.circuitPadding),
-        const Offset(CircuitParameters.circuitPadding + (CircuitParameters.circuitWidth / 2), CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
-      ),
+      ...CircuitLineMesh1,
+      ...CircuitLineMesh2,
+      ...CircuitLinesMesh3,
+      ...CircuitLinesMesh4
     ];
 }
 
@@ -65,6 +85,18 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   List<VoltageSource> voltageSources = [];
   List<CurrentSource> currentSources = [];
   Component selectedComponent = Component.resistor;
+
+  // Mesh1
+  CircuitMesh mesh1 = CircuitMesh();
+  // Mesh2
+  CircuitMesh mesh2 = CircuitMesh();
+  // Mesh3
+  CircuitMesh mesh3 = CircuitMesh();
+  // Mesh 4
+  CircuitMesh mesh4 = CircuitMesh();
+  // TODO: split logic to add components here so we can validate numbers ->
+  // it makes sense to have a overall list of components though to simplify
+  // Draw features
 
   // Images
   ui.Image? resistorImage;
