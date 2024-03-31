@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:ETSIIValente/components/CircuitLine.dart';
 import 'package:ETSIIValente/components/current_source.dart';
+import 'package:ETSIIValente/thevenin_window.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:typed_data';
@@ -355,9 +356,21 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
                   ),
                 ),
               ),
+            ),
+            Container(
+              alignment: Alignment.bottomRight,
+              padding: EdgeInsets.only(right: 40.0, bottom: 40.0),
+              child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => TheveninWindow(circuit: circuit)));
+                  },
+                  child: const Text('Calcular equivalente Thevenin',
+                      style: TextStyle(color: Colors.brown))
+              ),
             )
           ],
-        ));
+        ),
+    );
   }
 }
 
@@ -439,15 +452,15 @@ class CircuitPainter extends CustomPainter {
     // Restore the canvas to the previous state
     // Draw the value text above the component
     // Create a text painter to draw the value
-    TextSpan span = new TextSpan(
-        style: new TextStyle(color: Colors.black),
+    TextSpan span = TextSpan(
+        style: const TextStyle(color: Colors.black),
         text: value.toString() +
             (selectedComponent == Component.resistor
                 ? "Ω"
                 : selectedComponent == Component.voltageSource
                     ? "V"
                     : "A")); // You might want to customize the unit based on the component type
-    TextPainter tp = new TextPainter(
+    TextPainter tp = TextPainter(
         text: span,
         textAlign: TextAlign.center,
         textDirection: TextDirection.ltr);
