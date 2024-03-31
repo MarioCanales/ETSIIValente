@@ -156,23 +156,22 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
   bool _isTapOnComponent(Offset tapPosition) {
     bool toReturn = false;
+    // Tolerance = tap tolerance + component size
+    double tolerance = CircuitParameters.componentRange + CircuitParameters.tolerance;
     for (var resistor in resistors) {
-      if ((tapPosition - resistor.position).distance <
-          CircuitParameters.componentRange + CircuitParameters.tolerance) {
+      if(resistor.isTapOnComponent(tapPosition, tolerance)) {
         print("Tap is too close to an existing resistor.");
         return true;
       }
     }
     for (var source in voltageSources) {
-      if ((tapPosition - source.position).distance <
-          CircuitParameters.componentRange + CircuitParameters.tolerance) {
+      if (source.isTapOnComponent(tapPosition, tolerance)){
         print("Tap is too close to an existing voltage source.");
         return true;
       }
     }
     for (var source in currentSources) {
-      if ((tapPosition - source.position).distance <
-          CircuitParameters.componentRange + CircuitParameters.tolerance) {
+      if (source.isTapOnComponent(tapPosition, tolerance)){
         print("Tap is too close to an existing current source.");
         return true;
       }
@@ -249,7 +248,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Enter Value"),
+            title: Text("Introduce el valor"),
             content: TextField(
               controller: valueController,
               decoration: InputDecoration(
@@ -281,11 +280,11 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
         mesh.resistors.add(Resistor(adjustedPosition, value));
         resistors.add(Resistor(adjustedPosition, value));
       } else if (selectedComponent == Component.voltageSource) {
-        mesh.voltageSources.add(VoltageSource(adjustedPosition, value));
-        voltageSources.add(VoltageSource(adjustedPosition, value));
+        mesh.voltageSources.add(VoltageSource(adjustedPosition, value, 1));
+        voltageSources.add(VoltageSource(adjustedPosition, value, 1));
       } else {
-        mesh.currentSources.add(CurrentSource(adjustedPosition, value));
-        currentSources.add(CurrentSource(adjustedPosition, value));
+        mesh.currentSources.add(CurrentSource(adjustedPosition, value, 1));
+        currentSources.add(CurrentSource(adjustedPosition, value, 1));
       }
     });
   }
@@ -439,7 +438,7 @@ class CircuitPainter extends CustomPainter {
     // If the resistor is on a vertical line, apply rotation
     if (isVerticalLine) {
       canvas.translate(position.dx, position.dy);
-      canvas.rotate(pi / 2);
+      canvas.rotate(-pi / 2);
       canvas.translate(-position.dx, -position.dy);
     }
     // Draw the image

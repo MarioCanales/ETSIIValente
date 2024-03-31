@@ -1,7 +1,9 @@
 import 'dart:ui';
 
-class CurrentSource {
-  Offset position;
+import 'electric_component.dart';
+
+class CurrentSource extends ElectricComponent{
   double current;
-  CurrentSource(this.position, this.current);
+  int sign;
+  CurrentSource(Offset position, this.current, this.sign): super(position);
 }

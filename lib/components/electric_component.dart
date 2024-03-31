@@ -1,9 +1,14 @@
-abstract class ElectricComponent {
-  double position; // A cordinate will be fixed (e.g. in horizontal lines we
-                   // Already have the x and we just need the y
-  ElectricComponent({this.position = 0}); //Default
+import 'dart:ui';
 
-  void updatePosition(double newPosition) {
-    position = newPosition;
+abstract class ElectricComponent {
+  Offset position;
+  ElectricComponent(this.position);
+  // TODO: maybe add here draw component with canvas? deal with futures
+
+  bool isTapOnComponent(Offset tapPosition, double tolerance) {
+    if ((tapPosition - position).distance < tolerance) {
+      return true;
+    }
+    return false;
   }
 }

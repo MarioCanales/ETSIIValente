@@ -1,8 +1,9 @@
-
 import 'dart:ui';
 
-class VoltageSource {
-  Offset position;
+import 'package:ETSIIValente/components/electric_component.dart';
+
+class VoltageSource extends ElectricComponent{
   double voltage;
-  VoltageSource(this.position, this.voltage);
+  int sign;
+  VoltageSource(Offset position, this.voltage, this.sign): super(position);
 }

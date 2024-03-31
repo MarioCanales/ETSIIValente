@@ -1,7 +1,7 @@
 import 'dart:ui';
+import 'electric_component.dart';
 
-class Resistor {
-  Offset position;
+class Resistor extends ElectricComponent {
   double resistance;
-  Resistor(this.position, this.resistance);
+  Resistor(Offset position, this.resistance) : super(position);
 }
