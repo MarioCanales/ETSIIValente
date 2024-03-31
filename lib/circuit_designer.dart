@@ -8,15 +8,11 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'components/CircuitMesh.dart';
+import 'components/TwoMeshCircuit.dart';
 import 'components/resistor.dart';
 import 'components/voltage_source.dart';
 
 enum Component { resistor, voltageSource, currentSource }
-
-class CircuitDesigner extends StatefulWidget {
-  @override
-  _CircuitDesignerState createState() => _CircuitDesignerState();
-}
 
 class CircuitParameters {
   static const double tolerance = 10.0;
@@ -30,74 +26,99 @@ class CircuitParameters {
   // Structuring mesh numbers according to Alfonso doc
   // (available on TFG documentation)
 
-  static List<CircuitLine> CircuitLineMesh1 = [
+  static List<CircuitLine> CircuitLinesMesh1 = [
     // Top right line
     CircuitLine(
-      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding),
-      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth, CircuitParameters.circuitPadding),
+      const Offset(
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2,
+          CircuitParameters.circuitPadding),
+      const Offset(
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth,
+          CircuitParameters.circuitPadding),
     )
   ];
 
-  static List<CircuitLine> CircuitLineMesh2 = [
+  static List<CircuitLine> CircuitLinesMesh2 = [
     // Bottom right line
     CircuitLine(
-      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
-      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      const Offset(
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2,
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      const Offset(
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth,
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
     )
   ];
 
   static List<CircuitLine> CircuitLinesMesh3 = [
     // Middle vertical line
     CircuitLine(
-      const Offset(CircuitParameters.circuitPadding + (CircuitParameters.circuitWidth / 2), CircuitParameters.circuitPadding),
-      const Offset(CircuitParameters.circuitPadding + (CircuitParameters.circuitWidth / 2), CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      const Offset(
+          CircuitParameters.circuitPadding +
+              (CircuitParameters.circuitWidth / 2),
+          CircuitParameters.circuitPadding),
+      const Offset(
+          CircuitParameters.circuitPadding +
+              (CircuitParameters.circuitWidth / 2),
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
     )
   ];
 
   static List<CircuitLine> CircuitLinesMesh4 = [
     // Top left line
     CircuitLine(
-      const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
-      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding),
+      const Offset(
+          CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
+      const Offset(
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2,
+          CircuitParameters.circuitPadding),
     ),
     // Bottom left line
     CircuitLine(
-      const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
-      const Offset(CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      const Offset(CircuitParameters.circuitPadding,
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      const Offset(
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2,
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
     ),
     // Left vertical line
     CircuitLine(
-      const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
-      const Offset(CircuitParameters.circuitPadding, CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      const Offset(
+          CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
+      const Offset(CircuitParameters.circuitPadding,
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
     ),
   ];
 
-  static List<CircuitLine> CircuitLines  = [
-      ...CircuitLineMesh1,
-      ...CircuitLineMesh2,
-      ...CircuitLinesMesh3,
-      ...CircuitLinesMesh4
-    ];
+  static Map<TwoMeshCircuitIdentifier, List<CircuitLine>> MeshesLinesMap = {
+    TwoMeshCircuitIdentifier.mesh1: CircuitLinesMesh1,
+    TwoMeshCircuitIdentifier.mesh2: CircuitLinesMesh2,
+    TwoMeshCircuitIdentifier.mesh3: CircuitLinesMesh3,
+    TwoMeshCircuitIdentifier.mesh4: CircuitLinesMesh4
+  };
+
+  static List<CircuitLine> CircuitLines = [
+    ...CircuitLinesMesh1,
+    ...CircuitLinesMesh2,
+    ...CircuitLinesMesh3,
+    ...CircuitLinesMesh4
+  ];
+}
+
+class CircuitDesigner extends StatefulWidget {
+  @override
+  _CircuitDesignerState createState() => _CircuitDesignerState();
 }
 
 class _CircuitDesignerState extends State<CircuitDesigner> {
+  TwoMeshCircuit circuit = TwoMeshCircuit();
+  // it makes sense to have a overall list of components though to simplify
+  // Draw features
   List<Resistor> resistors = [];
   List<VoltageSource> voltageSources = [];
   List<CurrentSource> currentSources = [];
+  // Variable for drawing components
   Component selectedComponent = Component.resistor;
-
-  // Mesh1
-  CircuitMesh mesh1 = CircuitMesh();
-  // Mesh2
-  CircuitMesh mesh2 = CircuitMesh();
-  // Mesh3
-  CircuitMesh mesh3 = CircuitMesh();
-  // Mesh 4
-  CircuitMesh mesh4 = CircuitMesh();
-  // TODO: split logic to add components here so we can validate numbers ->
-  // it makes sense to have a overall list of components though to simplify
-  // Draw features
-
   // Images
   ui.Image? resistorImage;
   ui.Image? voltageSourceImage;
@@ -120,15 +141,16 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     ui.decodeImageFromList(bytes, callback);
   }
 
-  bool _isTapOnBorder(Offset tapPosition) {
-    // First iteration: check all
-    for (CircuitLine line in CircuitParameters.CircuitLines) {
-      if (line.distanceToPoint(tapPosition) < CircuitParameters.tolerance) {
-        return true; // Tap is close to this line
+  TwoMeshCircuitIdentifier? _isTapOnBorder(Offset tapPosition) {
+    // Iterate map to return the specific mesh or "None"
+    for (var mesh in CircuitParameters.MeshesLinesMap.entries) {
+      for (CircuitLine line in mesh.value) {
+        if (line.distanceToPoint(tapPosition) < CircuitParameters.tolerance) {
+          return mesh.key;
+        }
       }
     }
-    print("Touch outside the circuit");
-    return false; // No line is close enough to the tap position
+    return null; // No line is close enough to the tap position
   }
 
   bool _isTapOnComponent(Offset tapPosition) {
@@ -185,7 +207,39 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     return tapPosition; // Return original position if no line is close enough
   }
 
-  void _addComponentAtPosition(TapDownDetails details) async {
+  Future<bool> _validateCurrentSourceAddition(TwoMeshCircuit circuit, TwoMeshCircuitIdentifier target) async {
+    String? message;
+    if (target == TwoMeshCircuitIdentifier.mesh1 ||
+        target == TwoMeshCircuitIdentifier.mesh2) {
+      message = "No se puede colocar una fuente de intensidad en una rama abierta";
+    } else if (circuit.getMesh(TwoMeshCircuitIdentifier.mesh3).currentSources.isNotEmpty ||
+        circuit.getMesh(TwoMeshCircuitIdentifier.mesh4).currentSources.isNotEmpty) {
+      message = "Ya existe una fuente de intensidad en el circuito. Para circuitos de 2 mallas solo se acepta una fuente de intensidad.";
+    }
+    if (message != null) {
+      // Validation error
+      await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Error al añadir componente"),
+              content: Text(message!),
+              actions: <Widget>[
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
+      return false;
+    }
+    return true;
+  }
+
+  void _addComponentAtPosition(TapDownDetails details, CircuitMesh mesh) async {
     Offset adjustedPosition = _adjustComponentPosition(details.localPosition);
     TextEditingController valueController = TextEditingController();
 
@@ -201,8 +255,8 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
                 hintText: selectedComponent == Component.resistor
                     ? "Resistance (Ohms)"
                     : selectedComponent == Component.voltageSource
-                    ? "Voltage (Volts)"
-                    : "Current (Amperes)",
+                        ? "Voltage (Volts)"
+                        : "Current (Amperes)",
               ),
               keyboardType: TextInputType.number,
             ),
@@ -217,21 +271,23 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
           );
         });
 
-    double value = double.tryParse(valueController.text) ?? 0.0; // Default to 0 if parse fails
+    double value = double.tryParse(valueController.text) ??
+        0.0; // Default to 0 if parse fails
 
     // Add component with value
     setState(() {
       if (selectedComponent == Component.resistor) {
+        mesh.resistors.add(Resistor(adjustedPosition, value));
         resistors.add(Resistor(adjustedPosition, value));
       } else if (selectedComponent == Component.voltageSource) {
+        mesh.voltageSources.add(VoltageSource(adjustedPosition, value));
         voltageSources.add(VoltageSource(adjustedPosition, value));
       } else {
+        mesh.currentSources.add(CurrentSource(adjustedPosition, value));
         currentSources.add(CurrentSource(adjustedPosition, value));
       }
     });
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -266,10 +322,22 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
             ),
             Expanded(
               child: GestureDetector(
-                onTapDown: (TapDownDetails details) {
-                  if (_isTapOnBorder(details.localPosition) &&
+                onTapDown: (TapDownDetails details) async {
+                  TwoMeshCircuitIdentifier? meshIdentifier =
+                      _isTapOnBorder(details.localPosition);
+                  if ((meshIdentifier != null) &&
                       !_isTapOnComponent(details.localPosition)) {
-                    _addComponentAtPosition(details);
+                    print("Tap is on mesh $meshIdentifier");
+                    // validate Current Sources by Alfonso doc
+                    bool validAddition = true;
+                    if (selectedComponent == Component.currentSource) {
+                      validAddition = await _validateCurrentSourceAddition(
+                          circuit, meshIdentifier);
+                    }
+                    if (validAddition) {
+                      _addComponentAtPosition(
+                          details, circuit.getMesh(meshIdentifier));
+                    }
                   }
                 },
                 child: Container(
@@ -319,16 +387,25 @@ class CircuitPainter extends CustomPainter {
     }
     // Draw the resistor image at each position
     if (resistorImage != null) {
-      resistors.forEach((resistor) =>
-          _drawComponent(canvas, resistorImage!, resistor.position, resistor.resistance, Component.resistor));
-      voltageSources.forEach((source) =>
-          _drawComponent(canvas, voltageSourceImage!, source.position, source.voltage, Component.voltageSource));
-      currentSources.forEach((source) =>
-          _drawComponent(canvas, currentSourceImage!, source.position, source.current, Component.currentSource));
+      resistors.forEach((resistor) => _drawComponent(canvas, resistorImage!,
+          resistor.position, resistor.resistance, Component.resistor));
+      voltageSources.forEach((source) => _drawComponent(
+          canvas,
+          voltageSourceImage!,
+          source.position,
+          source.voltage,
+          Component.voltageSource));
+      currentSources.forEach((source) => _drawComponent(
+          canvas,
+          currentSourceImage!,
+          source.position,
+          source.current,
+          Component.currentSource));
     }
   }
 
-  void _drawComponent(Canvas canvas, ui.Image image, Offset position, double value, Component selectedComponent) {
+  void _drawComponent(Canvas canvas, ui.Image image, Offset position,
+      double value, Component selectedComponent) {
     bool isVerticalLine =
         position.dx == CircuitParameters.circuitPadding || // Left vertical line
             position.dx ==
@@ -362,14 +439,26 @@ class CircuitPainter extends CustomPainter {
     // Restore the canvas to the previous state
     // Draw the value text above the component
     // Create a text painter to draw the value
-    TextSpan span = new TextSpan(style: new TextStyle(color: Colors.black), text: value.toString() + (selectedComponent == Component.resistor ? "Ω" : selectedComponent == Component.voltageSource ? "V" : "A")); // You might want to customize the unit based on the component type
-    TextPainter tp = new TextPainter(text: span, textAlign: TextAlign.center, textDirection: TextDirection.ltr);
+    TextSpan span = new TextSpan(
+        style: new TextStyle(color: Colors.black),
+        text: value.toString() +
+            (selectedComponent == Component.resistor
+                ? "Ω"
+                : selectedComponent == Component.voltageSource
+                    ? "V"
+                    : "A")); // You might want to customize the unit based on the component type
+    TextPainter tp = new TextPainter(
+        text: span,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr);
     tp.layout();
     // Calculate the offset to center the text above the component
     // Subtract half the text width from the component's center position
     double textX = position.dx - (tp.width / 2);
     // Adjust the y position to move the text above the component, modifying the offset as needed
-    double textY = position.dy - CircuitParameters.imageHeight - tp.height; // You may need to adjust this based on your component size
+    double textY = position.dy -
+        CircuitParameters.imageHeight -
+        tp.height; // You may need to adjust this based on your component size
     // Paint the text
     tp.paint(canvas, Offset(textX, textY));
 
