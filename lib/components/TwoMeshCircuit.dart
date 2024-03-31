@@ -36,9 +36,52 @@ class TwoMeshCircuit {
     }
   }
 
+  bool hasCurrentSource(TwoMeshCircuitIdentifier id) {
+    if(id == TwoMeshCircuitIdentifier.mesh1) {
+      return mesh1.currentSources.isNotEmpty;
+    } else if (id == TwoMeshCircuitIdentifier.mesh2) {
+      return mesh2.currentSources.isNotEmpty;
+    } else if (id == TwoMeshCircuitIdentifier.mesh3) {
+      return mesh3.currentSources.isNotEmpty;
+    } else {
+      return mesh4.currentSources.isNotEmpty;
+    }
+  }
+
+
   TheveninEquivalent calculateTheveninEquivalent() {
-    // PLACEHOLDER VALUES
-    // TODO: add logic
-    return TheveninEquivalent(5, 7);
+    // As per Alfonso doc
+
+    // Resistance calculation
+    double theveninResistance = 0;
+    for(var resistor in mesh1.resistors) {
+      theveninResistance += resistor.resistance;
+    }
+    for(var resistor in mesh2.resistors) {
+      theveninResistance += resistor.resistance;
+    }
+    // Calculate accumulated values per mesh
+    double mesh4Resistance = 0;
+    for(var resistor in mesh4.resistors){
+      mesh4Resistance += resistor.resistance;
+    }
+    double mesh3Resistance = 0;
+    for(var resistor in mesh3.resistors){
+      mesh3Resistance += resistor.resistance;
+    }
+
+    if(hasCurrentSource(TwoMeshCircuitIdentifier.mesh3)) {
+      // Add Mesh4 resistance
+      theveninResistance += mesh4Resistance;
+    } else if(hasCurrentSource(TwoMeshCircuitIdentifier.mesh4)) {
+      // Add Mesh3 resistance
+      theveninResistance += mesh3Resistance;
+    } else {
+      // No current sources in the circuit -> R4 || R3
+      theveninResistance += (mesh3Resistance*mesh4Resistance)/(mesh3Resistance+mesh4Resistance);
+    }
+
+    // TODO: add voltage calculation logic
+    return TheveninEquivalent(5, theveninResistance);
   }
 }

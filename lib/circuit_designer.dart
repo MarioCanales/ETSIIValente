@@ -213,8 +213,8 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     if (target == TwoMeshCircuitIdentifier.mesh1 ||
         target == TwoMeshCircuitIdentifier.mesh2) {
       message = "No se puede colocar una fuente de intensidad en una rama abierta";
-    } else if (circuit.getMesh(TwoMeshCircuitIdentifier.mesh3).currentSources.isNotEmpty ||
-        circuit.getMesh(TwoMeshCircuitIdentifier.mesh4).currentSources.isNotEmpty) {
+    } else if (circuit.hasCurrentSource(TwoMeshCircuitIdentifier.mesh3) ||
+        circuit.hasCurrentSource(TwoMeshCircuitIdentifier.mesh4)) {
       message = "Ya existe una fuente de intensidad en el circuito. Para circuitos de 2 mallas solo se acepta una fuente de intensidad.";
     }
     if (message != null) {
