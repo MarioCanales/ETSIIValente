@@ -1,3 +1,5 @@
+import 'package:ETSIIValente/components/TheveninEquivalent.dart';
+
 import '../components/current_source.dart';
 import '../components/resistor.dart';
 import '../components/voltage_source.dart';
@@ -32,5 +34,11 @@ class TwoMeshCircuit {
     } else {
       return mesh4;
     }
+  }
+
+  TheveninEquivalent calculateTheveninEquivalent() {
+    // PLACEHOLDER VALUES
+    // TODO: add logic
+    return TheveninEquivalent(5, 7);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:ETSIIValente/components/TheveninEquivalent.dart';
 import 'package:ETSIIValente/components/TwoMeshCircuit.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,14 +10,14 @@ class TheveninWindow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: calculate Thevenin equivalent (on each circuit class)
+    TheveninEquivalent equivalent = circuit.calculateTheveninEquivalent();
     return Scaffold(
       appBar: AppBar(
         title: Text("Equivalente Thevenin"),
       ),
       body: Center(
         child: CustomPaint(
-            painter: TheveninPainter(5,7),
+            painter: TheveninPainter(equivalent.resistance, equivalent.voltage),
             size: Size(200,100),
           ),
         )
