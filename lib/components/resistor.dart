@@ -9,7 +9,7 @@ class Resistor extends ElectricComponent {
   Resistor(Offset position, this.resistance) : super(position);
 
   @override
-  void showEditDialog(BuildContext context, Function updateCallback) {
+  void showEditDialog(BuildContext context, Function updateCallback, Function deleteCallback, Function rotateCallback) {
     TextEditingController controller = TextEditingController(text: resistance.toString());
     showDialog(
         context: context,
@@ -34,6 +34,12 @@ class Resistor extends ElectricComponent {
                   double newValue = double.tryParse(controller.text) ?? resistance;
                   updateCallback(newValue);
                   Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Eliminar'),
+                onPressed: () {
+                  showDeleteConfirmation(context, deleteCallback);
                 },
               ),
             ],

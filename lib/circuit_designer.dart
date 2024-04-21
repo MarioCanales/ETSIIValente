@@ -208,14 +208,50 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     return tapPosition; // Return original position if no line is close enough
   }
 
-  void _updateComponentValue(ElectricComponent component, double newValue) {
+  void _updateComponentValue(ElectricComponent component, double newValue, TwoMeshCircuitIdentifier meshCircuitIdentifier) {
+    CircuitMesh mesh = circuit.getMesh(meshCircuitIdentifier);
+    mesh.deleteComponent(component);
     setState(() {
       if(component is Resistor) {
         component.resistance = newValue;
+        mesh.resistors.add(component); // new values
       } else if(component is CurrentSource) {
         component.current = newValue;
+        mesh.currentSources.add(component);
       } else if (component is VoltageSource) {
         component.voltage = newValue;
+        mesh.voltageSources.add(component);
+      }
+    });
+  }
+
+  void _rotateComponent(ElectricComponent component, TwoMeshCircuitIdentifier meshCircuitIdentifier) {
+    CircuitMesh mesh = circuit.getMesh(meshCircuitIdentifier);
+    mesh.deleteComponent(component);
+    setState(() {
+      if(component is CurrentSource) {
+        component.sign = -1 * component.sign;
+        mesh.currentSources.add(component);
+      } else if (component is VoltageSource) {
+        component.sign = -1 * component.sign;
+        mesh.voltageSources.add(component);
+      }
+    });
+  }
+  void _deleteComponent(ElectricComponent component, TwoMeshCircuitIdentifier meshCircuitIdentifier) {
+    CircuitMesh mesh = circuit.getMesh(meshCircuitIdentifier);
+    print("List2 - Before delete: ${mesh.currentSources.length} sources");
+    // List used for calculation
+    mesh.deleteComponent(component);
+    print("List 1 - After delete: ${mesh.currentSources.length} sources");
+    setState(() {
+      // List used for render
+      if(component is Resistor) {
+        resistors.remove(component);
+      } else if(component is CurrentSource) {
+        currentSources.remove(component);
+      } else if (component is VoltageSource) {
+        voltageSources.remove(component);
       }
     });
   }
@@ -269,10 +305,10 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
               controller: valueController,
               decoration: InputDecoration(
                 hintText: selectedComponent == SelectedComponent.resistor
-                    ? "Resistance (Ohms)"
+                    ? "Resistencia (Ohmios)"
                     : selectedComponent == SelectedComponent.voltageSource
-                        ? "Voltage (Volts)"
-                        : "Current (Amperes)",
+                        ? "Voltaje (Voltios)"
+                        : "Corriente (Amperios)",
               ),
               keyboardType: TextInputType.number,
             ),
@@ -391,9 +427,12 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
                     // TODO: refine tolerance for this edit method.
                     // idea: if is not edit, add a +5 in tolerance and vice-versa
                     print("Starting component edit on: ${component}");
-                    component.showEditDialog(context, (newValue) {
-                      _updateComponentValue(component, newValue);
-                    });
+                    component.showEditDialog(
+                      context,
+                      (newValue) => _updateComponentValue(component, newValue, meshIdentifier),
+                      () => _deleteComponent(component, meshIdentifier),
+                      () => _rotateComponent(component, meshIdentifier)
+                    );
                   }
                   else if(selectedComponent != SelectedComponent.edit && component == null) {
                     // validate Current Sources by Alfonso doc
@@ -469,27 +508,31 @@ class CircuitPainter extends CustomPainter {
     for (var line in lines) {
       line.draw(canvas, paint);
     }
-    // Draw the resistor image at each position
+    // Check that at least an image is loaded
     if (resistorImage != null) {
       resistors.forEach((resistor) => _drawComponent(canvas, resistorImage!,
-          resistor.position, resistor.resistance, SelectedComponent.resistor));
+          resistor.position, resistor.resistance, SelectedComponent.resistor,1));
       voltageSources.forEach((source) => _drawComponent(
           canvas,
           voltageSourceImage!,
           source.position,
           source.voltage,
-          SelectedComponent.voltageSource));
+          SelectedComponent.voltageSource,
+          source.sign
+      ));
       currentSources.forEach((source) => _drawComponent(
           canvas,
           currentSourceImage!,
           source.position,
           source.current,
-          SelectedComponent.currentSource));
+          SelectedComponent.currentSource,
+          source.sign
+      ));
     }
   }
 
   void _drawComponent(Canvas canvas, ui.Image image, Offset position,
-      double value, SelectedComponent selectedComponent) {
+      double value, SelectedComponent selectedComponent, int sign) {
     bool isVerticalLine =
         position.dx == CircuitParameters.circuitPadding || // Left vertical line
             position.dx ==
@@ -507,12 +550,19 @@ class CircuitPainter extends CustomPainter {
     );
     canvas.save();
 
-    // If the resistor is on a vertical line, apply rotation
+    // Rotation calculation
+    double rotationAngle = 0;
     if (isVerticalLine) {
+      rotationAngle = sign * (-pi) / 2;
+    } else if(sign == -1) { // reverse horizontal
+      rotationAngle = pi;
+    }
+    if (rotationAngle != 0) {
       canvas.translate(position.dx, position.dy);
-      canvas.rotate(-pi / 2);
+      canvas.rotate(rotationAngle);
       canvas.translate(-position.dx, -position.dy);
     }
+
     // Draw the image
     canvas.drawImageRect(
       image,
@@ -523,14 +573,23 @@ class CircuitPainter extends CustomPainter {
     // Restore the canvas to the previous state
     // Draw the value text above the component
     // Create a text painter to draw the value
+    canvas.restore();
+
+    // If vertical rotate -pi/2 FIXED regardless of sign
+    canvas.save();
+    if (isVerticalLine) {
+      canvas.translate(position.dx, position.dy);
+      canvas.rotate(-pi / 2);
+      canvas.translate(-position.dx, -position.dy);
+    }
     TextSpan span = TextSpan(
         style: const TextStyle(color: Colors.black),
         text: value.toString() +
             (selectedComponent == SelectedComponent.resistor
                 ? "Ω"
                 : selectedComponent == SelectedComponent.voltageSource
-                    ? "V"
-                    : "A")); // You might want to customize the unit based on the component type
+                ? "V"
+                : "A")); // You might want to customize the unit based on the component type
     TextPainter tp = TextPainter(
         text: span,
         textAlign: TextAlign.center,
