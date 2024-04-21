@@ -120,6 +120,8 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   List<CurrentSource> currentSources = [];
   // Variable for drawing components
   Component selectedComponent = Component.resistor;
+  // Edit mode var
+  bool isEditMode = false;
   // Images
   ui.Image? resistorImage;
   ui.Image? voltageSourceImage;
@@ -157,21 +159,22 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   bool _isTapOnComponent(Offset tapPosition) {
     bool toReturn = false;
     // Tolerance = tap tolerance + component size
-    double tolerance = CircuitParameters.componentRange + CircuitParameters.tolerance;
+    double tolerance =
+        CircuitParameters.componentRange + CircuitParameters.tolerance;
     for (var resistor in resistors) {
-      if(resistor.isTapOnComponent(tapPosition, tolerance)) {
+      if (resistor.isTapOnComponent(tapPosition, tolerance)) {
         print("Tap is too close to an existing resistor.");
         return true;
       }
     }
     for (var source in voltageSources) {
-      if (source.isTapOnComponent(tapPosition, tolerance)){
+      if (source.isTapOnComponent(tapPosition, tolerance)) {
         print("Tap is too close to an existing voltage source.");
         return true;
       }
     }
     for (var source in currentSources) {
-      if (source.isTapOnComponent(tapPosition, tolerance)){
+      if (source.isTapOnComponent(tapPosition, tolerance)) {
         print("Tap is too close to an existing current source.");
         return true;
       }
@@ -207,14 +210,17 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     return tapPosition; // Return original position if no line is close enough
   }
 
-  Future<bool> _validateCurrentSourceAddition(TwoMeshCircuit circuit, TwoMeshCircuitIdentifier target) async {
+  Future<bool> _validateCurrentSourceAddition(
+      TwoMeshCircuit circuit, TwoMeshCircuitIdentifier target) async {
     String? message;
     if (target == TwoMeshCircuitIdentifier.mesh1 ||
         target == TwoMeshCircuitIdentifier.mesh2) {
-      message = "No se puede colocar una fuente de intensidad en una rama abierta";
+      message =
+          "No se puede colocar una fuente de intensidad en una rama abierta";
     } else if (circuit.hasCurrentSource(TwoMeshCircuitIdentifier.mesh3) ||
         circuit.hasCurrentSource(TwoMeshCircuitIdentifier.mesh4)) {
-      message = "Ya existe una fuente de intensidad en el circuito. Para circuitos de 2 mallas solo se acepta una fuente de intensidad.";
+      message =
+          "Ya existe una fuente de intensidad en el circuito. Para circuitos de 2 mallas solo se acepta una fuente de intensidad.";
     }
     if (message != null) {
       // Validation error
@@ -292,83 +298,91 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Diseña tu circuito'),
-        ),
-        body: Column(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                IconButton(
-                  icon: Icon(Icons.electrical_services),
-                  onPressed: () => setState(() {
-                    selectedComponent = Component.resistor;
-                  }),
-                ),
-                IconButton(
-                  icon: Icon(Icons.battery_charging_full),
-                  onPressed: () => setState(() {
-                    selectedComponent = Component.voltageSource;
-                  }),
-                ),
-                IconButton(
-                  icon: Icon(Icons.bike_scooter),
-                  onPressed: () => setState(() {
-                    selectedComponent = Component.currentSource;
-                  }),
-                )
-              ],
-            ),
-            Expanded(
-              child: GestureDetector(
-                onTapDown: (TapDownDetails details) async {
-                  TwoMeshCircuitIdentifier? meshIdentifier =
-                      _isTapOnBorder(details.localPosition);
-                  if ((meshIdentifier != null) &&
-                      !_isTapOnComponent(details.localPosition)) {
-                    print("Tap is on mesh $meshIdentifier");
-                    // validate Current Sources by Alfonso doc
-                    bool validAddition = true;
-                    if (selectedComponent == Component.currentSource) {
-                      validAddition = await _validateCurrentSourceAddition(
-                          circuit, meshIdentifier);
-                    }
-                    if (validAddition) {
-                      _addComponentAtPosition(
-                          details, circuit.getMesh(meshIdentifier));
-                    }
-                  }
+      appBar: AppBar(
+        title: const Text('Diseña tu circuito'),
+      ),
+      body: Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              GestureDetector(
+                onTap: () =>
+                    setState(() => selectedComponent = Component.resistor),
+                child: Image.asset('assets/resistor.jpg', width: 50),
+              ),
+              GestureDetector(
+                onTap: () =>
+                    setState(() => selectedComponent = Component.voltageSource),
+                child: Image.asset('assets/voltajeFuente.png', width: 50),
+              ),
+              GestureDetector(
+                onTap: () =>
+                    setState(() => selectedComponent = Component.currentSource),
+                child: Image.asset('assets/fuenteIntensidad.png', width: 50),
+              ),
+              GestureDetector(
+                onTap: () {
+                  // Activate edit mode
+                  setState(() => isEditMode = true);
                 },
-                child: Container(
-                  height: 1300,
-                  width: double.infinity,
-                  color: Colors.white,
-                  child: CustomPaint(
-                    painter: CircuitPainter(
-                        resistors,
-                        voltageSources,
-                        currentSources,
-                        resistorImage,
-                        voltageSourceImage,
-                        currentSourceImage),
-                  ),
+                child: const Icon(Icons.edit,
+                    size: 24), // Or use an image if you have a specific icon
+              ),
+            ],
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTapDown: (TapDownDetails details) async {
+                TwoMeshCircuitIdentifier? meshIdentifier =
+                    _isTapOnBorder(details.localPosition);
+                if ((meshIdentifier != null) &&
+                    !_isTapOnComponent(details.localPosition)) {
+                  print("Tap is on mesh $meshIdentifier");
+                  // validate Current Sources by Alfonso doc
+                  bool validAddition = true;
+                  if (selectedComponent == Component.currentSource) {
+                    validAddition = await _validateCurrentSourceAddition(
+                        circuit, meshIdentifier);
+                  }
+                  if (validAddition) {
+                    _addComponentAtPosition(
+                        details, circuit.getMesh(meshIdentifier));
+                  }
+                }
+              },
+              child: Container(
+                height: 1300,
+                width: double.infinity,
+                color: Colors.white,
+                child: CustomPaint(
+                  painter: CircuitPainter(
+                      resistors,
+                      voltageSources,
+                      currentSources,
+                      resistorImage,
+                      voltageSourceImage,
+                      currentSourceImage),
                 ),
               ),
             ),
-            Container(
-              alignment: Alignment.bottomRight,
-              padding: EdgeInsets.only(right: 40.0, bottom: 40.0),
-              child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => TheveninWindow(circuit: circuit)));
-                  },
-                  child: const Text('Calcular equivalente Thevenin',
-                      style: TextStyle(color: Colors.brown))
-              ),
-            )
-          ],
-        ),
+          ),
+          Container(
+            alignment: Alignment.bottomRight,
+            padding: EdgeInsets.only(right: 40.0, bottom: 40.0),
+            child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              TheveninWindow(circuit: circuit)));
+                },
+                child: const Text('Calcular equivalente Thevenin',
+                    style: TextStyle(color: Colors.brown))),
+          )
+        ],
+      ),
     );
   }
 }

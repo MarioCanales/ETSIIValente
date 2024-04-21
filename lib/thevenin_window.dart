@@ -18,7 +18,7 @@ class TheveninWindow extends StatelessWidget {
       body: Center(
         child: CustomPaint(
             painter: TheveninPainter(equivalent.resistance, equivalent.voltage),
-            size: Size(200,100),
+            size: Size(400,200),
           ),
         )
       );
