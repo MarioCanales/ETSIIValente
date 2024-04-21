@@ -13,7 +13,7 @@ import 'components/TwoMeshCircuit.dart';
 import 'components/resistor.dart';
 import 'components/voltage_source.dart';
 
-enum Component { resistor, voltageSource, currentSource }
+enum SelectedComponent { resistor, voltageSource, currentSource, edit }
 
 class CircuitParameters {
   static const double tolerance = 10.0;
@@ -118,10 +118,8 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   List<Resistor> resistors = [];
   List<VoltageSource> voltageSources = [];
   List<CurrentSource> currentSources = [];
-  // Variable for drawing components
-  Component selectedComponent = Component.resistor;
-  // Edit mode var
-  bool isEditMode = false;
+  // Variable for drawing/editing components
+  SelectedComponent selectedComponent = SelectedComponent.edit;
   // Images
   ui.Image? resistorImage;
   ui.Image? voltageSourceImage;
@@ -258,9 +256,9 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
             content: TextField(
               controller: valueController,
               decoration: InputDecoration(
-                hintText: selectedComponent == Component.resistor
+                hintText: selectedComponent == SelectedComponent.resistor
                     ? "Resistance (Ohms)"
-                    : selectedComponent == Component.voltageSource
+                    : selectedComponent == SelectedComponent.voltageSource
                         ? "Voltage (Volts)"
                         : "Current (Amperes)",
               ),
@@ -282,10 +280,10 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
     // Add component with value
     setState(() {
-      if (selectedComponent == Component.resistor) {
+      if (selectedComponent == SelectedComponent.resistor) {
         mesh.resistors.add(Resistor(adjustedPosition, value));
         resistors.add(Resistor(adjustedPosition, value));
-      } else if (selectedComponent == Component.voltageSource) {
+      } else if (selectedComponent == SelectedComponent.voltageSource) {
         mesh.voltageSources.add(VoltageSource(adjustedPosition, value, 1));
         voltageSources.add(VoltageSource(adjustedPosition, value, 1));
       } else {
@@ -307,27 +305,64 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               GestureDetector(
-                onTap: () =>
-                    setState(() => selectedComponent = Component.resistor),
-                child: Image.asset('assets/resistor.jpg', width: 50),
+                onTap: () => setState(() => selectedComponent = SelectedComponent.resistor),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: selectedComponent == SelectedComponent.resistor ? Colors.blue : Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
+                  child: Opacity(
+                    opacity: selectedComponent == SelectedComponent.resistor ? 1.0 : 0.5,
+                    child: Image.asset('assets/resistor.jpg', width: 50),
+                  ),
+                ),
               ),
               GestureDetector(
-                onTap: () =>
-                    setState(() => selectedComponent = Component.voltageSource),
-                child: Image.asset('assets/voltajeFuente.png', width: 50),
+                onTap: () => setState(() => selectedComponent = SelectedComponent.voltageSource),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: selectedComponent == SelectedComponent.voltageSource ? Colors.blue : Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
+                  child: Opacity(
+                    opacity: selectedComponent == SelectedComponent.voltageSource ? 1.0 : 0.5,
+                    child: Image.asset('assets/voltajeFuente.png', width: 50),
+                  ),
+                ),
               ),
               GestureDetector(
-                onTap: () =>
-                    setState(() => selectedComponent = Component.currentSource),
-                child: Image.asset('assets/fuenteIntensidad.png', width: 50),
+                onTap: () => setState(() => selectedComponent = SelectedComponent.currentSource),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: selectedComponent == SelectedComponent.currentSource ? Colors.blue : Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
+                  child: Opacity(
+                    opacity: selectedComponent == SelectedComponent.currentSource ? 1.0 : 0.5,
+                    child: Image.asset('assets/fuenteIntensidad.png', width: 50),
+                  ),
+                ),
               ),
               GestureDetector(
-                onTap: () {
-                  // Activate edit mode
-                  setState(() => isEditMode = true);
-                },
-                child: const Icon(Icons.edit,
-                    size: 24), // Or use an image if you have a specific icon
+                onTap: () => setState(() => selectedComponent = SelectedComponent.edit),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: selectedComponent == SelectedComponent.edit ? Colors.blue : Colors.transparent,
+                      width: 2,
+                    ),
+                  ),
+                  child: Opacity(
+                    opacity: selectedComponent == SelectedComponent.edit ? 1.0 : 0.5,
+                    child: const Icon(Icons.edit, size: 24),
+                  ),
+                ),
               ),
             ],
           ),
@@ -341,7 +376,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
                   print("Tap is on mesh $meshIdentifier");
                   // validate Current Sources by Alfonso doc
                   bool validAddition = true;
-                  if (selectedComponent == Component.currentSource) {
+                  if (selectedComponent == SelectedComponent.currentSource) {
                     validAddition = await _validateCurrentSourceAddition(
                         circuit, meshIdentifier);
                   }
@@ -414,24 +449,24 @@ class CircuitPainter extends CustomPainter {
     // Draw the resistor image at each position
     if (resistorImage != null) {
       resistors.forEach((resistor) => _drawComponent(canvas, resistorImage!,
-          resistor.position, resistor.resistance, Component.resistor));
+          resistor.position, resistor.resistance, SelectedComponent.resistor));
       voltageSources.forEach((source) => _drawComponent(
           canvas,
           voltageSourceImage!,
           source.position,
           source.voltage,
-          Component.voltageSource));
+          SelectedComponent.voltageSource));
       currentSources.forEach((source) => _drawComponent(
           canvas,
           currentSourceImage!,
           source.position,
           source.current,
-          Component.currentSource));
+          SelectedComponent.currentSource));
     }
   }
 
   void _drawComponent(Canvas canvas, ui.Image image, Offset position,
-      double value, Component selectedComponent) {
+      double value, SelectedComponent selectedComponent) {
     bool isVerticalLine =
         position.dx == CircuitParameters.circuitPadding || // Left vertical line
             position.dx ==
@@ -468,9 +503,9 @@ class CircuitPainter extends CustomPainter {
     TextSpan span = TextSpan(
         style: const TextStyle(color: Colors.black),
         text: value.toString() +
-            (selectedComponent == Component.resistor
+            (selectedComponent == SelectedComponent.resistor
                 ? "Ω"
-                : selectedComponent == Component.voltageSource
+                : selectedComponent == SelectedComponent.voltageSource
                     ? "V"
                     : "A")); // You might want to customize the unit based on the component type
     TextPainter tp = TextPainter(
