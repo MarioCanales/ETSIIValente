@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
+
 abstract class ElectricComponent {
   Offset position;
   ElectricComponent(this.position);
@@ -11,4 +13,8 @@ abstract class ElectricComponent {
     }
     return false;
   }
+
+  void showEditDialog(BuildContext context, Function updateCallback);
+
+
 }

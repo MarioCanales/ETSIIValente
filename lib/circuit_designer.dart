@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:ETSIIValente/components/CircuitLine.dart';
 import 'package:ETSIIValente/components/current_source.dart';
+import 'package:ETSIIValente/components/electric_component.dart';
 import 'package:ETSIIValente/thevenin_window.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -154,30 +155,29 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     return null; // No line is close enough to the tap position
   }
 
-  bool _isTapOnComponent(Offset tapPosition) {
-    bool toReturn = false;
+  ElectricComponent? _isTapOnComponent(Offset tapPosition) {
     // Tolerance = tap tolerance + component size
     double tolerance =
         CircuitParameters.componentRange + CircuitParameters.tolerance;
     for (var resistor in resistors) {
       if (resistor.isTapOnComponent(tapPosition, tolerance)) {
         print("Tap is too close to an existing resistor.");
-        return true;
+        return resistor;
       }
     }
     for (var source in voltageSources) {
       if (source.isTapOnComponent(tapPosition, tolerance)) {
         print("Tap is too close to an existing voltage source.");
-        return true;
+        return source;
       }
     }
     for (var source in currentSources) {
       if (source.isTapOnComponent(tapPosition, tolerance)) {
         print("Tap is too close to an existing current source.");
-        return true;
+        return source;
       }
     }
-    return toReturn;
+    return null;
   }
 
   Offset _adjustComponentPosition(Offset tapPosition) {
@@ -206,6 +206,18 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     }
 
     return tapPosition; // Return original position if no line is close enough
+  }
+
+  void _updateComponentValue(ElectricComponent component, double newValue) {
+    setState(() {
+      if(component is Resistor) {
+        component.resistance = newValue;
+      } else if(component is CurrentSource) {
+        component.current = newValue;
+      } else if (component is VoltageSource) {
+        component.voltage = newValue;
+      }
+    });
   }
 
   Future<bool> _validateCurrentSourceAddition(
@@ -371,18 +383,29 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
               onTapDown: (TapDownDetails details) async {
                 TwoMeshCircuitIdentifier? meshIdentifier =
                     _isTapOnBorder(details.localPosition);
-                if ((meshIdentifier != null) &&
-                    !_isTapOnComponent(details.localPosition)) {
+                if (meshIdentifier != null) {
                   print("Tap is on mesh $meshIdentifier");
-                  // validate Current Sources by Alfonso doc
-                  bool validAddition = true;
-                  if (selectedComponent == SelectedComponent.currentSource) {
-                    validAddition = await _validateCurrentSourceAddition(
-                        circuit, meshIdentifier);
+                  ElectricComponent? component = _isTapOnComponent(details.localPosition);
+                  if(selectedComponent == SelectedComponent.edit && component != null) {
+                    // Edit mode, we need to check if there's a component
+                    // TODO: refine tolerance for this edit method.
+                    // idea: if is not edit, add a +5 in tolerance and vice-versa
+                    print("Starting component edit on: ${component}");
+                    component.showEditDialog(context, (newValue) {
+                      _updateComponentValue(component, newValue);
+                    });
                   }
-                  if (validAddition) {
-                    _addComponentAtPosition(
-                        details, circuit.getMesh(meshIdentifier));
+                  else if(selectedComponent != SelectedComponent.edit && component == null) {
+                    // validate Current Sources by Alfonso doc
+                    bool validAddition = true;
+                    if (selectedComponent == SelectedComponent.currentSource) {
+                      validAddition = await _validateCurrentSourceAddition(
+                          circuit, meshIdentifier);
+                    }
+                    if (validAddition) {
+                      _addComponentAtPosition(
+                          details, circuit.getMesh(meshIdentifier));
+                    }
                   }
                 }
               },
