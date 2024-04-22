@@ -1,8 +1,8 @@
-import 'package:ETSIIValente/components/electric_component.dart';
+import 'package:ETSIIValente/electricComponents/electric_component.dart';
 
-import '../components/current_source.dart';
-import '../components/resistor.dart';
-import '../components/voltage_source.dart';
+import '../electricComponents/current_source.dart';
+import '../electricComponents/resistor.dart';
+import '../electricComponents/voltage_source.dart';
 class CircuitMesh {
   List<Resistor> resistors;
   List<VoltageSource> voltageSources;

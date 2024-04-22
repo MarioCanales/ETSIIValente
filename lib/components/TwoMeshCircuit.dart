@@ -1,8 +1,8 @@
 import 'package:ETSIIValente/components/TheveninEquivalent.dart';
 
-import '../components/current_source.dart';
-import '../components/resistor.dart';
-import '../components/voltage_source.dart';
+import '../electricComponents/current_source.dart';
+import '../electricComponents/resistor.dart';
+import '../electricComponents/voltage_source.dart';
 import 'CircuitMesh.dart';
 
 enum TwoMeshCircuitIdentifier { mesh1, mesh2, mesh3, mesh4}

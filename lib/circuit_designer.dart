@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:ETSIIValente/components/CircuitLine.dart';
-import 'package:ETSIIValente/components/current_source.dart';
-import 'package:ETSIIValente/components/electric_component.dart';
+import 'package:ETSIIValente/electricComponents/current_source.dart';
+import 'package:ETSIIValente/electricComponents/electric_component.dart';
 import 'package:ETSIIValente/thevenin_window.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -11,8 +11,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'components/CircuitMesh.dart';
 import 'components/TwoMeshCircuit.dart';
-import 'components/resistor.dart';
-import 'components/voltage_source.dart';
+import 'electricComponents/resistor.dart';
+import 'electricComponents/voltage_source.dart';
 
 enum SelectedComponent { resistor, voltageSource, currentSource, edit }
 

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:ETSIIValente/components/electric_component.dart';
+import 'package:ETSIIValente/electricComponents/electric_component.dart';
 import 'package:flutter/material.dart';
 
 class VoltageSource extends ElectricComponent {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../components/electric_component.dart';
+import '../electricComponents/electric_component.dart';
 /*
 This class will represent either vertical or horizontal lines and a function
 to detect if a point is near with a margin of tolerance
