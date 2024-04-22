@@ -1,9 +1,10 @@
-import 'package:ETSIIValente/components/TheveninEquivalent.dart';
-import 'package:ETSIIValente/components/TwoMeshCircuit.dart';
+import 'package:ETSIIValente/circuitComponents/TheveninEquivalent.dart';
 import 'package:flutter/material.dart';
 
+import 'circuits/Circuit.dart';
+
 class TheveninWindow extends StatelessWidget {
-  final TwoMeshCircuit circuit;
+  final Circuit circuit;
 
   const TheveninWindow({Key? key, required this.circuit}) : super(key: key);
 

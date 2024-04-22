@@ -1,16 +1,17 @@
-import 'package:ETSIIValente/components/TheveninEquivalent.dart';
-
-import 'CircuitMesh.dart';
+import '../circuitComponents/CircuitMesh.dart';
+import '../circuitComponents/TheveninEquivalent.dart';
+import 'Circuit.dart';
 
 enum TwoMeshCircuitIdentifier { branch1, branch2, branch3, branch4}
 
-class TwoMeshCircuit {
+class TwoMeshCircuit extends Circuit {
+  // Branch1
   CircuitBranch branch1;
-  // Mesh2
+  // Branch2
   CircuitBranch branch2;
-  // Mesh3
+  // Branch3
   CircuitBranch branch3;
-  // Mesh 4
+  // Branch4
   CircuitBranch branch4;
   //No-args
   TwoMeshCircuit()

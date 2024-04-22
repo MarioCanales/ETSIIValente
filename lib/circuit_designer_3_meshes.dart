@@ -1,16 +1,17 @@
 import 'dart:math';
 
-import 'package:ETSIIValente/components/CircuitLine.dart';
+import 'package:ETSIIValente/circuitComponents/CircuitLine.dart';
+import 'package:ETSIIValente/circuits/ThreeMeshCircuit.dart';
 import 'package:ETSIIValente/electricComponents/current_source.dart';
 import 'package:ETSIIValente/electricComponents/electric_component.dart';
 import 'package:ETSIIValente/thevenin_window.dart';
+import 'package:ETSIIValente/utils/circuitUtils.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
-import 'components/CircuitMesh.dart';
-import 'components/TwoMeshCircuit.dart';
+import 'circuitComponents/CircuitMesh.dart';
 import 'electricComponents/resistor.dart';
 import 'electricComponents/voltage_source.dart';
 
@@ -32,7 +33,7 @@ class CircuitParameters {
     // Top right line
     CircuitLine(
       const Offset(
-          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2,
+          CircuitParameters.circuitPadding + (2*CircuitParameters.circuitWidth) / 3,
           CircuitParameters.circuitPadding),
       const Offset(
           CircuitParameters.circuitPadding + CircuitParameters.circuitWidth,
@@ -44,7 +45,7 @@ class CircuitParameters {
     // Bottom right line
     CircuitLine(
       const Offset(
-          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2,
+          CircuitParameters.circuitPadding + (2*CircuitParameters.circuitWidth) / 3,
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
       const Offset(
           CircuitParameters.circuitPadding + CircuitParameters.circuitWidth,
@@ -53,26 +54,64 @@ class CircuitParameters {
   ];
 
   static List<CircuitLine> CircuitLinesBranch3 = [
-    // Middle vertical line
+    // right Middle vertical line
     CircuitLine(
       const Offset(
           CircuitParameters.circuitPadding +
-              (CircuitParameters.circuitWidth / 2),
+              2*(CircuitParameters.circuitWidth / 3),
           CircuitParameters.circuitPadding),
       const Offset(
           CircuitParameters.circuitPadding +
-              (CircuitParameters.circuitWidth / 2),
+              2*(CircuitParameters.circuitWidth / 3),
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
     )
   ];
 
   static List<CircuitLine> CircuitLinesBranch4 = [
+    // middle top line
+    CircuitLine(
+      const Offset(
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3,
+          CircuitParameters.circuitPadding),
+      const Offset(
+          CircuitParameters.circuitPadding + 2*(CircuitParameters.circuitWidth/3),
+          CircuitParameters.circuitPadding),
+    ),
+  ];
+
+  static List<CircuitLine> CircuitLinesBranch5 = [
+    // middle bottom line
+    CircuitLine(
+      const Offset(
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3,
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      const Offset(
+          CircuitParameters.circuitPadding + 2*(CircuitParameters.circuitWidth/3),
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+    ),
+  ];
+
+  static List<CircuitLine> CircuitLinesBranch6 = [
+    // left Middle vertical line
+    CircuitLine(
+      const Offset(
+          CircuitParameters.circuitPadding +
+              (CircuitParameters.circuitWidth / 3),
+          CircuitParameters.circuitPadding),
+      const Offset(
+          CircuitParameters.circuitPadding +
+              (CircuitParameters.circuitWidth / 3),
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+    )
+  ];
+
+  static List<CircuitLine> CircuitLinesBranch7 = [
     // Top left line
     CircuitLine(
       const Offset(
           CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
       const Offset(
-          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2,
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3,
           CircuitParameters.circuitPadding),
     ),
     // Bottom left line
@@ -80,7 +119,7 @@ class CircuitParameters {
       const Offset(CircuitParameters.circuitPadding,
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
       const Offset(
-          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 2,
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3,
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
     ),
     // Left vertical line
@@ -92,28 +131,34 @@ class CircuitParameters {
     ),
   ];
 
-  static Map<TwoMeshCircuitIdentifier, List<CircuitLine>> BranchsLinesMap = {
-    TwoMeshCircuitIdentifier.branch1: CircuitLinesBranch1,
-    TwoMeshCircuitIdentifier.branch2: CircuitLinesBranch2,
-    TwoMeshCircuitIdentifier.branch3: CircuitLinesBranch3,
-    TwoMeshCircuitIdentifier.branch4: CircuitLinesBranch4
+  static Map<ThreeMeshCircuitIdentifier, List<CircuitLine>> BranchsLinesMap = {
+    ThreeMeshCircuitIdentifier.branch1: CircuitLinesBranch1,
+    ThreeMeshCircuitIdentifier.branch2: CircuitLinesBranch2,
+    ThreeMeshCircuitIdentifier.branch3: CircuitLinesBranch3,
+    ThreeMeshCircuitIdentifier.branch4: CircuitLinesBranch4,
+    ThreeMeshCircuitIdentifier.branch5: CircuitLinesBranch5,
+    ThreeMeshCircuitIdentifier.branch6: CircuitLinesBranch6,
+    ThreeMeshCircuitIdentifier.branch7: CircuitLinesBranch7
   };
 
   static List<CircuitLine> CircuitLines = [
     ...CircuitLinesBranch1,
     ...CircuitLinesBranch2,
     ...CircuitLinesBranch3,
-    ...CircuitLinesBranch4
+    ...CircuitLinesBranch4,
+    ...CircuitLinesBranch5,
+    ...CircuitLinesBranch6,
+    ...CircuitLinesBranch7
   ];
 }
 
-class CircuitDesigner extends StatefulWidget {
+class CircuitDesigner3Meshes extends StatefulWidget {
   @override
-  _CircuitDesignerState createState() => _CircuitDesignerState();
+  _CircuitDesigner3MeshesState createState() => _CircuitDesigner3MeshesState();
 }
 
-class _CircuitDesignerState extends State<CircuitDesigner> {
-  TwoMeshCircuit circuit = TwoMeshCircuit();
+class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
+  ThreeMeshCircuit circuit = ThreeMeshCircuit();
   // it makes sense to have a overall list of components though to simplify
   // Draw features
   List<Resistor> resistors = [];
@@ -132,9 +177,9 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     _loadImage(
         'assets/resistor.jpg', (img) => setState(() => resistorImage = img));
     _loadImage('assets/voltajeFuente.png',
-        (img) => setState(() => voltageSourceImage = img));
+            (img) => setState(() => voltageSourceImage = img));
     _loadImage('assets/fuenteIntensidad.png',
-        (img) => setState(() => currentSourceImage = img));
+            (img) => setState(() => currentSourceImage = img));
   }
 
   Future<void> _loadImage(String assetPath, Function(ui.Image) callback) async {
@@ -143,7 +188,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     ui.decodeImageFromList(bytes, callback);
   }
 
-  TwoMeshCircuitIdentifier? _isTapOnBorder(Offset tapPosition) {
+  ThreeMeshCircuitIdentifier? _isTapOnBorder(Offset tapPosition) {
     // Iterate map to return the specific branch or "None"
     for (var branch in CircuitParameters.BranchsLinesMap.entries) {
       for (CircuitLine line in branch.value) {
@@ -209,7 +254,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   }
 
   void _updateComponentValue(ElectricComponent component, double newValue,
-      TwoMeshCircuitIdentifier meshCircuitIdentifier) {
+      ThreeMeshCircuitIdentifier meshCircuitIdentifier) {
     CircuitBranch branch = circuit.getBranch(meshCircuitIdentifier);
     branch.deleteComponent(component);
     setState(() {
@@ -227,7 +272,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   }
 
   void _rotateComponent(ElectricComponent component,
-      TwoMeshCircuitIdentifier meshCircuitIdentifier) {
+      ThreeMeshCircuitIdentifier meshCircuitIdentifier) {
     CircuitBranch branch = circuit.getBranch(meshCircuitIdentifier);
     branch.deleteComponent(component);
     setState(() {
@@ -242,7 +287,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   }
 
   void _deleteComponent(ElectricComponent component,
-      TwoMeshCircuitIdentifier meshCircuitIdentifier) {
+      ThreeMeshCircuitIdentifier meshCircuitIdentifier) {
     CircuitBranch branch = circuit.getBranch(meshCircuitIdentifier);
     print("List2 - Before delete: ${branch.currentSources.length} sources");
     // List used for calculation
@@ -261,17 +306,22 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   }
 
   Future<bool> _validateCurrentSourceAddition(
-      TwoMeshCircuit circuit, TwoMeshCircuitIdentifier target) async {
+      ThreeMeshCircuit circuit, ThreeMeshCircuitIdentifier target) async {
     String? message;
-    if (target == TwoMeshCircuitIdentifier.branch1 ||
-        target == TwoMeshCircuitIdentifier.branch2) {
+    if (target == ThreeMeshCircuitIdentifier.branch1 ||
+        target == ThreeMeshCircuitIdentifier.branch2) {
       message =
-          "No se puede colocar una fuente de intensidad en una rama abierta";
-    } else if (circuit.hasCurrentSource(TwoMeshCircuitIdentifier.branch3) ||
-        circuit.hasCurrentSource(TwoMeshCircuitIdentifier.branch4)) {
+      "No se puede colocar una fuente de intensidad en una rama abierta";
+    } else if (currentSources.length == 2) {
       message =
-          "Ya existe una fuente de intensidad en el circuito. Para circuitos de 2 mallas solo se acepta una fuente de intensidad.";
+      "No se pueden colocar más fuentes de intensidad. El máximo de fuentes de intensidad en este circuito es de 2.";
+    } else if ((target == ThreeMeshCircuitIdentifier.branch3 ||target == ThreeMeshCircuitIdentifier.branch4 || target == ThreeMeshCircuitIdentifier.branch5)
+        && (circuit.hasCurrentSource(ThreeMeshCircuitIdentifier.branch3) || circuit.hasCurrentSource(ThreeMeshCircuitIdentifier.branch4) || circuit.hasCurrentSource(ThreeMeshCircuitIdentifier.branch5))
+    ) {
+      message =
+      "No se puede colocar una fuente de intensidad aquí. Hay una fuente en una rama cercana";
     }
+
     if (message != null) {
       // Validation error
       await showDialog(
@@ -317,46 +367,46 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
             title: Text("Introduce el valor"),
             content: Form(
                 child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  flex: 3,
-                  child: TextField(
-                    controller: valueController,
-                    decoration: InputDecoration(
-                      hintText: selectedComponent == SelectedComponent.resistor
-                          ? "Resistencia"
-                          : selectedComponent == SelectedComponent.voltageSource
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: TextField(
+                        controller: valueController,
+                        decoration: InputDecoration(
+                          hintText: selectedComponent == SelectedComponent.resistor
+                              ? "Resistencia"
+                              : selectedComponent == SelectedComponent.voltageSource
                               ? "Voltaje"
                               : "Intensidad",
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
                     ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  flex: 1,
-                  child: DropdownButtonFormField<String>(
-                    decoration: InputDecoration(border: OutlineInputBorder()),
-                    value: selectedUnit,
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          selectedUnit = newValue;
-                        });
-                      }
-                    },
-                    items: unitOptions
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                )
-              ],
-            )),
+                    SizedBox(width: 8),
+                    Expanded(
+                      flex: 1,
+                      child: DropdownButtonFormField<String>(
+                        decoration: InputDecoration(border: OutlineInputBorder()),
+                        value: selectedUnit,
+                        onChanged: (String? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              selectedUnit = newValue;
+                            });
+                          }
+                        },
+                        items: unitOptions
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    )
+                  ],
+                )),
             actions: <Widget>[
               TextButton(
                 child: Text("OK"),
@@ -371,7 +421,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     double value = double.tryParse(valueController.text) ??
         0.0; // Default to 0 if parse fails
 
-    value = convertValue(value, selectedUnit);
+    value = CircuitUtils.convertValue(value, selectedUnit);
 
     // Add component with value
     setState(() {
@@ -388,19 +438,6 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     });
   }
 
-  double convertValue(double value, String unit) {
-    switch (unit) {
-      case 'kΩ':
-        return value * 1000;
-      case 'mΩ':
-      case 'mV':
-      case 'mA':
-        return value / 1000; // Convert milli to base unit
-      default:
-        return value; // Base unit (ohms, volts, amperes)
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -414,7 +451,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
             children: <Widget>[
               GestureDetector(
                 onTap: () => setState(
-                    () => selectedComponent = SelectedComponent.resistor),
+                        () => selectedComponent = SelectedComponent.resistor),
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
@@ -434,46 +471,46 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
               ),
               GestureDetector(
                 onTap: () => setState(
-                    () => selectedComponent = SelectedComponent.voltageSource),
+                        () => selectedComponent = SelectedComponent.voltageSource),
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
                       color:
-                          selectedComponent == SelectedComponent.voltageSource
-                              ? Colors.blue
-                              : Colors.transparent,
+                      selectedComponent == SelectedComponent.voltageSource
+                          ? Colors.blue
+                          : Colors.transparent,
                       width: 2,
                     ),
                   ),
                   child: Opacity(
                     opacity:
-                        selectedComponent == SelectedComponent.voltageSource
-                            ? 1.0
-                            : 0.5,
+                    selectedComponent == SelectedComponent.voltageSource
+                        ? 1.0
+                        : 0.5,
                     child: Image.asset('assets/voltajeFuente.png', width: 50),
                   ),
                 ),
               ),
               GestureDetector(
                 onTap: () => setState(
-                    () => selectedComponent = SelectedComponent.currentSource),
+                        () => selectedComponent = SelectedComponent.currentSource),
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
                       color:
-                          selectedComponent == SelectedComponent.currentSource
-                              ? Colors.blue
-                              : Colors.transparent,
+                      selectedComponent == SelectedComponent.currentSource
+                          ? Colors.blue
+                          : Colors.transparent,
                       width: 2,
                     ),
                   ),
                   child: Opacity(
                     opacity:
-                        selectedComponent == SelectedComponent.currentSource
-                            ? 1.0
-                            : 0.5,
+                    selectedComponent == SelectedComponent.currentSource
+                        ? 1.0
+                        : 0.5,
                     child:
-                        Image.asset('assets/fuenteIntensidad.png', width: 50),
+                    Image.asset('assets/fuenteIntensidad.png', width: 50),
                   ),
                 ),
               ),
@@ -491,7 +528,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
                   ),
                   child: Opacity(
                     opacity:
-                        selectedComponent == SelectedComponent.edit ? 1.0 : 0.5,
+                    selectedComponent == SelectedComponent.edit ? 1.0 : 0.5,
                     child: const Icon(Icons.edit, size: 24),
                   ),
                 ),
@@ -501,12 +538,12 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
           Expanded(
             child: GestureDetector(
               onTapDown: (TapDownDetails details) async {
-                TwoMeshCircuitIdentifier? branchIdentifier =
-                    _isTapOnBorder(details.localPosition);
+                ThreeMeshCircuitIdentifier? branchIdentifier =
+                _isTapOnBorder(details.localPosition);
                 if (branchIdentifier != null) {
                   print("Tap is on branch $branchIdentifier");
                   ElectricComponent? component =
-                      _isTapOnComponent(details.localPosition);
+                  _isTapOnComponent(details.localPosition);
                   if (selectedComponent == SelectedComponent.edit &&
                       component != null) {
                     // Edit mode, we need to check if there's a component
@@ -515,10 +552,10 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
                     print("Starting component edit on: ${component}");
                     component.showEditDialog(
                         context,
-                        (newValue) => _updateComponentValue(
+                            (newValue) => _updateComponentValue(
                             component, newValue, branchIdentifier),
-                        () => _deleteComponent(component, branchIdentifier),
-                        () => _rotateComponent(component, branchIdentifier));
+                            () => _deleteComponent(component, branchIdentifier),
+                            () => _rotateComponent(component, branchIdentifier));
                   } else if (selectedComponent != SelectedComponent.edit &&
                       component == null) {
                     // validate Current Sources by Alfonso doc
@@ -624,9 +661,9 @@ class CircuitPainter extends CustomPainter {
       double value, SelectedComponent selectedComponent, int sign) {
     bool isVerticalLine =
         position.dx == CircuitParameters.circuitPadding || // Left vertical line
-            position.dx ==
-                CircuitParameters.circuitPadding +
-                    CircuitParameters.circuitWidth / 2;
+        position.dx == CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3 ||
+        position.dx == CircuitParameters.circuitPadding + 2*CircuitParameters.circuitWidth / 3
+    ;
 
     Rect destRect = Rect.fromCenter(
       center: position,
