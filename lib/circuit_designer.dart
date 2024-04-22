@@ -25,10 +25,10 @@ class CircuitParameters {
   static const double imageWidth = 60.0;
   static const double imageHeight = 30.0;
 
-  // Structuring mesh numbers according to Alfonso doc
+  // Structuring branch numbers according to Alfonso doc
   // (available on TFG documentation)
 
-  static List<CircuitLine> CircuitLinesMesh1 = [
+  static List<CircuitLine> CircuitLinesBranch1 = [
     // Top right line
     CircuitLine(
       const Offset(
@@ -40,7 +40,7 @@ class CircuitParameters {
     )
   ];
 
-  static List<CircuitLine> CircuitLinesMesh2 = [
+  static List<CircuitLine> CircuitLinesBranch2 = [
     // Bottom right line
     CircuitLine(
       const Offset(
@@ -52,7 +52,7 @@ class CircuitParameters {
     )
   ];
 
-  static List<CircuitLine> CircuitLinesMesh3 = [
+  static List<CircuitLine> CircuitLinesBranch3 = [
     // Middle vertical line
     CircuitLine(
       const Offset(
@@ -66,7 +66,7 @@ class CircuitParameters {
     )
   ];
 
-  static List<CircuitLine> CircuitLinesMesh4 = [
+  static List<CircuitLine> CircuitLinesBranch4 = [
     // Top left line
     CircuitLine(
       const Offset(
@@ -92,18 +92,18 @@ class CircuitParameters {
     ),
   ];
 
-  static Map<TwoMeshCircuitIdentifier, List<CircuitLine>> MeshesLinesMap = {
-    TwoMeshCircuitIdentifier.mesh1: CircuitLinesMesh1,
-    TwoMeshCircuitIdentifier.mesh2: CircuitLinesMesh2,
-    TwoMeshCircuitIdentifier.mesh3: CircuitLinesMesh3,
-    TwoMeshCircuitIdentifier.mesh4: CircuitLinesMesh4
+  static Map<TwoMeshCircuitIdentifier, List<CircuitLine>> BranchsLinesMap = {
+    TwoMeshCircuitIdentifier.branch1: CircuitLinesBranch1,
+    TwoMeshCircuitIdentifier.branch2: CircuitLinesBranch2,
+    TwoMeshCircuitIdentifier.branch3: CircuitLinesBranch3,
+    TwoMeshCircuitIdentifier.branch4: CircuitLinesBranch4
   };
 
   static List<CircuitLine> CircuitLines = [
-    ...CircuitLinesMesh1,
-    ...CircuitLinesMesh2,
-    ...CircuitLinesMesh3,
-    ...CircuitLinesMesh4
+    ...CircuitLinesBranch1,
+    ...CircuitLinesBranch2,
+    ...CircuitLinesBranch3,
+    ...CircuitLinesBranch4
   ];
 }
 
@@ -144,11 +144,11 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   }
 
   TwoMeshCircuitIdentifier? _isTapOnBorder(Offset tapPosition) {
-    // Iterate map to return the specific mesh or "None"
-    for (var mesh in CircuitParameters.MeshesLinesMap.entries) {
-      for (CircuitLine line in mesh.value) {
+    // Iterate map to return the specific branch or "None"
+    for (var branch in CircuitParameters.BranchsLinesMap.entries) {
+      for (CircuitLine line in branch.value) {
         if (line.distanceToPoint(tapPosition) < CircuitParameters.tolerance) {
-          return mesh.key;
+          return branch.key;
         }
       }
     }
@@ -210,44 +210,44 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
   void _updateComponentValue(ElectricComponent component, double newValue,
       TwoMeshCircuitIdentifier meshCircuitIdentifier) {
-    CircuitMesh mesh = circuit.getMesh(meshCircuitIdentifier);
-    mesh.deleteComponent(component);
+    CircuitBranch branch = circuit.getBranch(meshCircuitIdentifier);
+    branch.deleteComponent(component);
     setState(() {
       if (component is Resistor) {
         component.resistance = newValue;
-        mesh.resistors.add(component); // new values
+        branch.resistors.add(component); // new values
       } else if (component is CurrentSource) {
         component.current = newValue;
-        mesh.currentSources.add(component);
+        branch.currentSources.add(component);
       } else if (component is VoltageSource) {
         component.voltage = newValue;
-        mesh.voltageSources.add(component);
+        branch.voltageSources.add(component);
       }
     });
   }
 
   void _rotateComponent(ElectricComponent component,
       TwoMeshCircuitIdentifier meshCircuitIdentifier) {
-    CircuitMesh mesh = circuit.getMesh(meshCircuitIdentifier);
-    mesh.deleteComponent(component);
+    CircuitBranch branch = circuit.getBranch(meshCircuitIdentifier);
+    branch.deleteComponent(component);
     setState(() {
       if (component is CurrentSource) {
         component.sign = -1 * component.sign;
-        mesh.currentSources.add(component);
+        branch.currentSources.add(component);
       } else if (component is VoltageSource) {
         component.sign = -1 * component.sign;
-        mesh.voltageSources.add(component);
+        branch.voltageSources.add(component);
       }
     });
   }
 
   void _deleteComponent(ElectricComponent component,
       TwoMeshCircuitIdentifier meshCircuitIdentifier) {
-    CircuitMesh mesh = circuit.getMesh(meshCircuitIdentifier);
-    print("List2 - Before delete: ${mesh.currentSources.length} sources");
+    CircuitBranch branch = circuit.getBranch(meshCircuitIdentifier);
+    print("List2 - Before delete: ${branch.currentSources.length} sources");
     // List used for calculation
-    mesh.deleteComponent(component);
-    print("List 1 - After delete: ${mesh.currentSources.length} sources");
+    branch.deleteComponent(component);
+    print("List 1 - After delete: ${branch.currentSources.length} sources");
     setState(() {
       // List used for render
       if (component is Resistor) {
@@ -263,12 +263,12 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
   Future<bool> _validateCurrentSourceAddition(
       TwoMeshCircuit circuit, TwoMeshCircuitIdentifier target) async {
     String? message;
-    if (target == TwoMeshCircuitIdentifier.mesh1 ||
-        target == TwoMeshCircuitIdentifier.mesh2) {
+    if (target == TwoMeshCircuitIdentifier.branch1 ||
+        target == TwoMeshCircuitIdentifier.branch2) {
       message =
           "No se puede colocar una fuente de intensidad en una rama abierta";
-    } else if (circuit.hasCurrentSource(TwoMeshCircuitIdentifier.mesh3) ||
-        circuit.hasCurrentSource(TwoMeshCircuitIdentifier.mesh4)) {
+    } else if (circuit.hasCurrentSource(TwoMeshCircuitIdentifier.branch3) ||
+        circuit.hasCurrentSource(TwoMeshCircuitIdentifier.branch4)) {
       message =
           "Ya existe una fuente de intensidad en el circuito. Para circuitos de 2 mallas solo se acepta una fuente de intensidad.";
     }
@@ -295,7 +295,7 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     return true;
   }
 
-  void _addComponentAtPosition(TapDownDetails details, CircuitMesh mesh) async {
+  void _addComponentAtPosition(TapDownDetails details, CircuitBranch branch) async {
     Offset adjustedPosition = _adjustComponentPosition(details.localPosition);
     TextEditingController valueController = TextEditingController();
 
@@ -376,13 +376,13 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     // Add component with value
     setState(() {
       if (selectedComponent == SelectedComponent.resistor) {
-        mesh.resistors.add(Resistor(adjustedPosition, value));
+        branch.resistors.add(Resistor(adjustedPosition, value));
         resistors.add(Resistor(adjustedPosition, value));
       } else if (selectedComponent == SelectedComponent.voltageSource) {
-        mesh.voltageSources.add(VoltageSource(adjustedPosition, value, 1));
+        branch.voltageSources.add(VoltageSource(adjustedPosition, value, 1));
         voltageSources.add(VoltageSource(adjustedPosition, value, 1));
       } else {
-        mesh.currentSources.add(CurrentSource(adjustedPosition, value, 1));
+        branch.currentSources.add(CurrentSource(adjustedPosition, value, 1));
         currentSources.add(CurrentSource(adjustedPosition, value, 1));
       }
     });
@@ -501,10 +501,10 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
           Expanded(
             child: GestureDetector(
               onTapDown: (TapDownDetails details) async {
-                TwoMeshCircuitIdentifier? meshIdentifier =
+                TwoMeshCircuitIdentifier? branchIdentifier =
                     _isTapOnBorder(details.localPosition);
-                if (meshIdentifier != null) {
-                  print("Tap is on mesh $meshIdentifier");
+                if (branchIdentifier != null) {
+                  print("Tap is on branch $branchIdentifier");
                   ElectricComponent? component =
                       _isTapOnComponent(details.localPosition);
                   if (selectedComponent == SelectedComponent.edit &&
@@ -516,20 +516,20 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
                     component.showEditDialog(
                         context,
                         (newValue) => _updateComponentValue(
-                            component, newValue, meshIdentifier),
-                        () => _deleteComponent(component, meshIdentifier),
-                        () => _rotateComponent(component, meshIdentifier));
+                            component, newValue, branchIdentifier),
+                        () => _deleteComponent(component, branchIdentifier),
+                        () => _rotateComponent(component, branchIdentifier));
                   } else if (selectedComponent != SelectedComponent.edit &&
                       component == null) {
                     // validate Current Sources by Alfonso doc
                     bool validAddition = true;
                     if (selectedComponent == SelectedComponent.currentSource) {
                       validAddition = await _validateCurrentSourceAddition(
-                          circuit, meshIdentifier);
+                          circuit, branchIdentifier);
                     }
                     if (validAddition) {
                       _addComponentAtPosition(
-                          details, circuit.getMesh(meshIdentifier));
+                          details, circuit.getBranch(branchIdentifier));
                     }
                   }
                 }

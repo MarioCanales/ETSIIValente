@@ -3,18 +3,19 @@ import 'package:ETSIIValente/electricComponents/electric_component.dart';
 import '../electricComponents/current_source.dart';
 import '../electricComponents/resistor.dart';
 import '../electricComponents/voltage_source.dart';
-class CircuitMesh {
+
+class CircuitBranch {
   List<Resistor> resistors;
   List<VoltageSource> voltageSources;
   List<CurrentSource> currentSources;
 
   //No-args
-  CircuitMesh()
+  CircuitBranch()
       : resistors = [],
         voltageSources = [],
         currentSources = [];
 
-  CircuitMesh.withComponents(this.resistors, this.voltageSources, this.currentSources);
+  CircuitBranch.withComponents(this.resistors, this.voltageSources, this.currentSources);
 
   void addResistor(Resistor r) {
     resistors.add(r);
@@ -47,6 +48,4 @@ class CircuitMesh {
     }
   }
 
-// TODO: Implement rotateSource
-// TODO: Implement deleteComponent
 }
