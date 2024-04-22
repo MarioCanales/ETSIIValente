@@ -1,6 +1,5 @@
 import 'package:ETSIIValente/components/TheveninEquivalent.dart';
 import 'package:ETSIIValente/components/TwoMeshCircuit.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class TheveninWindow extends StatelessWidget {
@@ -16,45 +15,21 @@ class TheveninWindow extends StatelessWidget {
         title: Text("Equivalente Thevenin"),
       ),
       body: Center(
-        child: CustomPaint(
-            painter: TheveninPainter(equivalent.resistance, equivalent.voltage),
-            size: Size(400,200),
-          ),
-        )
-      );
-  }
-}
-
-class TheveninPainter extends CustomPainter {
-  final double resistance;
-  final double voltage;
-
-  TheveninPainter(this.resistance, this.voltage);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-        ..color = Colors.black
-        ..strokeWidth = 3;
-
-    canvas.drawLine(Offset(0, 0), Offset(size.width, 0), paint); // Top line
-    canvas.drawLine(Offset(0, 0), Offset(0, size.height), paint); // Left line
-    canvas.drawLine(Offset(0, size.height), Offset(size.width, size.height), paint);
-
-    // Add your voltage source and resistor representations here
-    // This is a placeholder for drawing
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: 'V = $voltage V , R = ${(resistance/1000).toStringAsFixed(2)} kΩ',
-        style: TextStyle(color: Colors.black, fontSize: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Image.asset(
+              'assets/equivalent-template.png',
+              width: 200, // Adjust the size as needed
+            ),
+            SizedBox(height: 20), // Space between image and text
+            Text(
+              'Vth = ${equivalent.voltage.toStringAsFixed(2)} V, Rth = ${(equivalent.resistance / 1000).toStringAsFixed(2)} kΩ',
+              style: TextStyle(fontSize: 20), // Adjust the style as needed
+            ),
+          ],
+        ),
       ),
-      textDirection: TextDirection.ltr,
     );
-    textPainter.layout();
-    textPainter.paint(canvas, Offset(size.width / 4, size.height / 2));
   }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-
 }
