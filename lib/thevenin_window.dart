@@ -45,7 +45,7 @@ class TheveninPainter extends CustomPainter {
     // This is a placeholder for drawing
     final textPainter = TextPainter(
       text: TextSpan(
-        text: 'V = $voltage , R = ${resistance.toStringAsFixed(2)}',
+        text: 'V = $voltage V , R = ${(resistance/1000).toStringAsFixed(2)} kΩ',
         style: TextStyle(color: Colors.black, fontSize: 20),
       ),
       textDirection: TextDirection.ltr,

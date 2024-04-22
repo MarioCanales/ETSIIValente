@@ -208,14 +208,15 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     return tapPosition; // Return original position if no line is close enough
   }
 
-  void _updateComponentValue(ElectricComponent component, double newValue, TwoMeshCircuitIdentifier meshCircuitIdentifier) {
+  void _updateComponentValue(ElectricComponent component, double newValue,
+      TwoMeshCircuitIdentifier meshCircuitIdentifier) {
     CircuitMesh mesh = circuit.getMesh(meshCircuitIdentifier);
     mesh.deleteComponent(component);
     setState(() {
-      if(component is Resistor) {
+      if (component is Resistor) {
         component.resistance = newValue;
         mesh.resistors.add(component); // new values
-      } else if(component is CurrentSource) {
+      } else if (component is CurrentSource) {
         component.current = newValue;
         mesh.currentSources.add(component);
       } else if (component is VoltageSource) {
@@ -225,11 +226,12 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     });
   }
 
-  void _rotateComponent(ElectricComponent component, TwoMeshCircuitIdentifier meshCircuitIdentifier) {
+  void _rotateComponent(ElectricComponent component,
+      TwoMeshCircuitIdentifier meshCircuitIdentifier) {
     CircuitMesh mesh = circuit.getMesh(meshCircuitIdentifier);
     mesh.deleteComponent(component);
     setState(() {
-      if(component is CurrentSource) {
+      if (component is CurrentSource) {
         component.sign = -1 * component.sign;
         mesh.currentSources.add(component);
       } else if (component is VoltageSource) {
@@ -238,7 +240,9 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
       }
     });
   }
-  void _deleteComponent(ElectricComponent component, TwoMeshCircuitIdentifier meshCircuitIdentifier) {
+
+  void _deleteComponent(ElectricComponent component,
+      TwoMeshCircuitIdentifier meshCircuitIdentifier) {
     CircuitMesh mesh = circuit.getMesh(meshCircuitIdentifier);
     print("List2 - Before delete: ${mesh.currentSources.length} sources");
     // List used for calculation
@@ -246,9 +250,9 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     print("List 1 - After delete: ${mesh.currentSources.length} sources");
     setState(() {
       // List used for render
-      if(component is Resistor) {
+      if (component is Resistor) {
         resistors.remove(component);
-      } else if(component is CurrentSource) {
+      } else if (component is CurrentSource) {
         currentSources.remove(component);
       } else if (component is VoltageSource) {
         voltageSources.remove(component);
@@ -295,23 +299,64 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     Offset adjustedPosition = _adjustComponentPosition(details.localPosition);
     TextEditingController valueController = TextEditingController();
 
+    String selectedUnit = "kΩ"; // Default
+    List<String> unitOptions = ["kΩ", "Ω"];
+    if (selectedComponent == SelectedComponent.voltageSource) {
+      unitOptions = ["V", "mV"];
+      selectedUnit = "V";
+    } else if (selectedComponent == SelectedComponent.currentSource) {
+      unitOptions = ["mA","A"];
+      selectedUnit = "mA";
+    }
+
     // Show dialog to get the value
     await showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text("Introduce el valor"),
-            content: TextField(
-              controller: valueController,
-              decoration: InputDecoration(
-                hintText: selectedComponent == SelectedComponent.resistor
-                    ? "Resistencia (Ohmios)"
-                    : selectedComponent == SelectedComponent.voltageSource
-                        ? "Voltaje (Voltios)"
-                        : "Corriente (Amperios)",
-              ),
-              keyboardType: TextInputType.number,
-            ),
+            content: Form(
+                child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: TextField(
+                    controller: valueController,
+                    decoration: InputDecoration(
+                      hintText: selectedComponent == SelectedComponent.resistor
+                          ? "Resistencia"
+                          : selectedComponent == SelectedComponent.voltageSource
+                              ? "Voltaje"
+                              : "Intensidad",
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+                SizedBox(width: 8),
+                Expanded(
+                  flex: 1,
+                  child: DropdownButtonFormField<String>(
+                    decoration: InputDecoration(border: OutlineInputBorder()),
+                    value: selectedUnit,
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        setState(() {
+                          selectedUnit = newValue;
+                        });
+                      }
+                    },
+                    items: unitOptions
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                )
+              ],
+            )),
             actions: <Widget>[
               TextButton(
                 child: Text("OK"),
@@ -325,6 +370,8 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
 
     double value = double.tryParse(valueController.text) ??
         0.0; // Default to 0 if parse fails
+
+    value = convertValue(value, selectedUnit);
 
     // Add component with value
     setState(() {
@@ -341,6 +388,19 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
     });
   }
 
+  double convertValue(double value, String unit) {
+    switch (unit) {
+      case 'kΩ':
+        return value * 1000;
+      case 'mΩ':
+      case 'mV':
+      case 'mA':
+        return value / 1000; // Convert milli to base unit
+      default:
+        return value; // Base unit (ohms, volts, amperes)
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -353,61 +413,85 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               GestureDetector(
-                onTap: () => setState(() => selectedComponent = SelectedComponent.resistor),
+                onTap: () => setState(
+                    () => selectedComponent = SelectedComponent.resistor),
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: selectedComponent == SelectedComponent.resistor ? Colors.blue : Colors.transparent,
+                      color: selectedComponent == SelectedComponent.resistor
+                          ? Colors.blue
+                          : Colors.transparent,
                       width: 2,
                     ),
                   ),
                   child: Opacity(
-                    opacity: selectedComponent == SelectedComponent.resistor ? 1.0 : 0.5,
+                    opacity: selectedComponent == SelectedComponent.resistor
+                        ? 1.0
+                        : 0.5,
                     child: Image.asset('assets/resistor.jpg', width: 50),
                   ),
                 ),
               ),
               GestureDetector(
-                onTap: () => setState(() => selectedComponent = SelectedComponent.voltageSource),
+                onTap: () => setState(
+                    () => selectedComponent = SelectedComponent.voltageSource),
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: selectedComponent == SelectedComponent.voltageSource ? Colors.blue : Colors.transparent,
+                      color:
+                          selectedComponent == SelectedComponent.voltageSource
+                              ? Colors.blue
+                              : Colors.transparent,
                       width: 2,
                     ),
                   ),
                   child: Opacity(
-                    opacity: selectedComponent == SelectedComponent.voltageSource ? 1.0 : 0.5,
+                    opacity:
+                        selectedComponent == SelectedComponent.voltageSource
+                            ? 1.0
+                            : 0.5,
                     child: Image.asset('assets/voltajeFuente.png', width: 50),
                   ),
                 ),
               ),
               GestureDetector(
-                onTap: () => setState(() => selectedComponent = SelectedComponent.currentSource),
+                onTap: () => setState(
+                    () => selectedComponent = SelectedComponent.currentSource),
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: selectedComponent == SelectedComponent.currentSource ? Colors.blue : Colors.transparent,
+                      color:
+                          selectedComponent == SelectedComponent.currentSource
+                              ? Colors.blue
+                              : Colors.transparent,
                       width: 2,
                     ),
                   ),
                   child: Opacity(
-                    opacity: selectedComponent == SelectedComponent.currentSource ? 1.0 : 0.5,
-                    child: Image.asset('assets/fuenteIntensidad.png', width: 50),
+                    opacity:
+                        selectedComponent == SelectedComponent.currentSource
+                            ? 1.0
+                            : 0.5,
+                    child:
+                        Image.asset('assets/fuenteIntensidad.png', width: 50),
                   ),
                 ),
               ),
               GestureDetector(
-                onTap: () => setState(() => selectedComponent = SelectedComponent.edit),
+                onTap: () =>
+                    setState(() => selectedComponent = SelectedComponent.edit),
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: selectedComponent == SelectedComponent.edit ? Colors.blue : Colors.transparent,
+                      color: selectedComponent == SelectedComponent.edit
+                          ? Colors.blue
+                          : Colors.transparent,
                       width: 2,
                     ),
                   ),
                   child: Opacity(
-                    opacity: selectedComponent == SelectedComponent.edit ? 1.0 : 0.5,
+                    opacity:
+                        selectedComponent == SelectedComponent.edit ? 1.0 : 0.5,
                     child: const Icon(Icons.edit, size: 24),
                   ),
                 ),
@@ -421,20 +505,22 @@ class _CircuitDesignerState extends State<CircuitDesigner> {
                     _isTapOnBorder(details.localPosition);
                 if (meshIdentifier != null) {
                   print("Tap is on mesh $meshIdentifier");
-                  ElectricComponent? component = _isTapOnComponent(details.localPosition);
-                  if(selectedComponent == SelectedComponent.edit && component != null) {
+                  ElectricComponent? component =
+                      _isTapOnComponent(details.localPosition);
+                  if (selectedComponent == SelectedComponent.edit &&
+                      component != null) {
                     // Edit mode, we need to check if there's a component
                     // TODO: refine tolerance for this edit method.
                     // idea: if is not edit, add a +5 in tolerance and vice-versa
                     print("Starting component edit on: ${component}");
                     component.showEditDialog(
-                      context,
-                      (newValue) => _updateComponentValue(component, newValue, meshIdentifier),
-                      () => _deleteComponent(component, meshIdentifier),
-                      () => _rotateComponent(component, meshIdentifier)
-                    );
-                  }
-                  else if(selectedComponent != SelectedComponent.edit && component == null) {
+                        context,
+                        (newValue) => _updateComponentValue(
+                            component, newValue, meshIdentifier),
+                        () => _deleteComponent(component, meshIdentifier),
+                        () => _rotateComponent(component, meshIdentifier));
+                  } else if (selectedComponent != SelectedComponent.edit &&
+                      component == null) {
                     // validate Current Sources by Alfonso doc
                     bool validAddition = true;
                     if (selectedComponent == SelectedComponent.currentSource) {
@@ -499,7 +585,7 @@ class CircuitPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.black
-      ..strokeWidth = 3
+      ..strokeWidth = 1.3
       ..style = PaintingStyle.stroke; // Draw only the outline
 
     // Define Lines of the circuit
@@ -510,24 +596,27 @@ class CircuitPainter extends CustomPainter {
     }
     // Check that at least an image is loaded
     if (resistorImage != null) {
-      resistors.forEach((resistor) => _drawComponent(canvas, resistorImage!,
-          resistor.position, resistor.resistance, SelectedComponent.resistor,1));
+      resistors.forEach((resistor) => _drawComponent(
+          canvas,
+          resistorImage!,
+          resistor.position,
+          resistor.resistance,
+          SelectedComponent.resistor,
+          1));
       voltageSources.forEach((source) => _drawComponent(
           canvas,
           voltageSourceImage!,
           source.position,
           source.voltage,
           SelectedComponent.voltageSource,
-          source.sign
-      ));
+          source.sign));
       currentSources.forEach((source) => _drawComponent(
           canvas,
           currentSourceImage!,
           source.position,
           source.current,
           SelectedComponent.currentSource,
-          source.sign
-      ));
+          source.sign));
     }
   }
 
@@ -554,7 +643,8 @@ class CircuitPainter extends CustomPainter {
     double rotationAngle = 0;
     if (isVerticalLine) {
       rotationAngle = sign * (-pi) / 2;
-    } else if(sign == -1) { // reverse horizontal
+    } else if (sign == -1) {
+      // reverse horizontal
       rotationAngle = pi;
     }
     if (rotationAngle != 0) {
@@ -582,14 +672,19 @@ class CircuitPainter extends CustomPainter {
       canvas.rotate(-pi / 2);
       canvas.translate(-position.dx, -position.dy);
     }
+
+    String valueText = "";
+    if(selectedComponent == SelectedComponent.resistor) {
+      valueText = "${(value/1000).toStringAsFixed(1)} KΩ";
+    } else if (selectedComponent == SelectedComponent.voltageSource) {
+      valueText = "${(value).toStringAsFixed(1)} V";
+    } else {
+      valueText = "${(value*1000).toStringAsFixed(1)} mA";
+    }
     TextSpan span = TextSpan(
         style: const TextStyle(color: Colors.black),
-        text: value.toString() +
-            (selectedComponent == SelectedComponent.resistor
-                ? "Ω"
-                : selectedComponent == SelectedComponent.voltageSource
-                ? "V"
-                : "A")); // You might want to customize the unit based on the component type
+        text: valueText
+    );
     TextPainter tp = TextPainter(
         text: span,
         textAlign: TextAlign.center,
