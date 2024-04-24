@@ -310,6 +310,7 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
       selectedUnit = "mA";
     }
 
+    bool add = true;
     // Show dialog to get the value
     await showDialog(
         context: context,
@@ -360,6 +361,13 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
             )),
             actions: <Widget>[
               TextButton(
+                child: Text("Cancelar"),
+                onPressed: () {
+                  add = false;
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
                 child: Text("OK"),
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -369,24 +377,24 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
           );
         });
 
-    double value = double.tryParse(valueController.text) ??
-        0.0; // Default to 0 if parse fails
-
-    value = CircuitUtils.convertValue(value, selectedUnit);
-
-    // Add component with value
-    setState(() {
-      if (selectedComponent == SelectedComponent.resistor) {
-        branch.resistors.add(Resistor(adjustedPosition, value));
-        resistors.add(Resistor(adjustedPosition, value));
-      } else if (selectedComponent == SelectedComponent.voltageSource) {
-        branch.voltageSources.add(VoltageSource(adjustedPosition, value, 1));
-        voltageSources.add(VoltageSource(adjustedPosition, value, 1));
-      } else {
-        branch.currentSources.add(CurrentSource(adjustedPosition, value, 1));
-        currentSources.add(CurrentSource(adjustedPosition, value, 1));
-      }
-    });
+    if(add){
+      double value = double.tryParse(valueController.text) ??
+          0.0; // Default to 0 if parse fails
+      value = CircuitUtils.convertValue(value, selectedUnit);
+      // Add component with value
+      setState(() {
+        if (selectedComponent == SelectedComponent.resistor) {
+          branch.resistors.add(Resistor(adjustedPosition, value));
+          resistors.add(Resistor(adjustedPosition, value));
+        } else if (selectedComponent == SelectedComponent.voltageSource) {
+          branch.voltageSources.add(VoltageSource(adjustedPosition, value, 1));
+          voltageSources.add(VoltageSource(adjustedPosition, value, 1));
+        } else {
+          branch.currentSources.add(CurrentSource(adjustedPosition, value, 1));
+          currentSources.add(CurrentSource(adjustedPosition, value, 1));
+        }
+      });
+    }
   }
 
   @override
