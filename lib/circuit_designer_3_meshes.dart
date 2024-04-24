@@ -664,6 +664,8 @@ class CircuitPainter extends CustomPainter {
         position.dx == CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3 ||
         position.dx == CircuitParameters.circuitPadding + 2*CircuitParameters.circuitWidth / 3
     ;
+    bool isBottom = position.dy ==
+        CircuitParameters.circuitPadding + CircuitParameters.circuitHeight;
 
     Rect destRect = Rect.fromCenter(
       center: position,
@@ -680,8 +682,13 @@ class CircuitPainter extends CustomPainter {
     double rotationAngle = 0;
     if (isVerticalLine) {
       rotationAngle = sign * (-pi) / 2;
+    } else if (isBottom) {
+      // For keeping orientation consistency
+      rotationAngle = sign == 1
+          ? pi
+          : 0;
     } else if (sign == -1) {
-      // reverse horizontal
+      // reverse horizontal in top line
       rotationAngle = pi;
     }
     if (rotationAngle != 0) {

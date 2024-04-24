@@ -48,38 +48,72 @@ class TwoMeshCircuit extends Circuit {
 
 
   TheveninEquivalent calculateTheveninEquivalent() {
+    double r1 = 0;
+    double r2 = 0;
+    double r3 = 0;
+    double r4 = 0;
+
+    for (var resistor in branch1.resistors) {
+      r1 += resistor.resistance;
+    }
+    for (var resistor in branch2.resistors) {
+      r2 += resistor.resistance;
+    }
+    for (var resistor in branch3.resistors) {
+      r3 += resistor.resistance;
+    }
+    for (var resistor in branch4.resistors) {
+      r4 += resistor.resistance;
+    }
+
+    double v1 = 0;
+    double v2 = 0;
+    double v3 = 0;
+    double v4 = 0;
+
+    for (var voltsource in branch1.voltageSources) {
+      v1 += voltsource.voltage;
+    }
+    for (var voltsource in branch2.voltageSources) {
+      v2 += voltsource.voltage;
+    }
+    for (var voltsource in branch3.voltageSources) {
+      v3 += voltsource.voltage;
+    }
+    for (var voltsource in branch4.voltageSources) {
+      v4 += voltsource.voltage;
+    }
+
     // As per Alfonso doc
-
     // Resistance calculation
-    double theveninResistance = 0;
-    for(var resistor in branch1.resistors) {
-      theveninResistance += resistor.resistance;
-    }
-    for(var resistor in branch2.resistors) {
-      theveninResistance += resistor.resistance;
-    }
-    // Calculate accumulated values per mesh
-    double mesh4Resistance = 0;
-    for(var resistor in branch4.resistors){
-      mesh4Resistance += resistor.resistance;
-    }
-    double mesh3Resistance = 0;
-    for(var resistor in branch3.resistors){
-      mesh3Resistance += resistor.resistance;
-    }
-
+    double theveninResistance = r1 + r2;
     if(hasCurrentSource(TwoMeshCircuitIdentifier.branch3)) {
       // Add Mesh4 resistance
-      theveninResistance += mesh4Resistance;
+      theveninResistance += r4;
     } else if(hasCurrentSource(TwoMeshCircuitIdentifier.branch4)) {
       // Add Mesh3 resistance
-      theveninResistance += mesh3Resistance;
-    } else {
+      theveninResistance += r3;
+    } else if (r3+r4 != 0){
       // No current sources in the circuit -> R4 || R3
-      theveninResistance += (mesh3Resistance*mesh4Resistance)/(mesh3Resistance+mesh4Resistance);
+      theveninResistance += (r3*r4)/(r3+r4);
     }
 
+    double theveninVoltage = v1 + v2;
+    if(hasCurrentSource(TwoMeshCircuitIdentifier.branch3)) {
+      // Caclulate VR4 and add
+      double ir3 = branch3.currentSources.first.current*branch3.currentSources.first.sign;
+      theveninVoltage += ir3*r4+v4;
+    } else if (hasCurrentSource(TwoMeshCircuitIdentifier.branch4)) {
+      // Calculate VR3 and add
+      double ir4 = branch4.currentSources.first.current*branch4.currentSources.first.sign;
+      theveninVoltage += ir4*r3+v3;
+    } else {
+      double i = (-v3 + v4)/(r3+r4);
+      theveninVoltage += r3*i+v3; // DEBERIA SER SOLO IGUAL?
+    }
+    // Voltage calculation
+
     // TODO: add voltage calculation logic
-    return TheveninEquivalent(5, theveninResistance);
+    return TheveninEquivalent(theveninVoltage, theveninResistance);
   }
 }

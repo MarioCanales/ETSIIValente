@@ -1,8 +1,14 @@
 
 
+import 'dart:ui';
+
+import 'package:ETSIIValente/electricComponents/voltage_source.dart';
+
 import '../circuitComponents/CircuitMesh.dart';
 import '../circuitComponents/TheveninEquivalent.dart';
+import '../electricComponents/resistor.dart';
 import 'Circuit.dart';
+import 'TwoMeshCircuit.dart';
 
 enum ThreeMeshCircuitIdentifier { branch1, branch2, branch3, branch4, branch5, branch6, branch7}
 
@@ -72,6 +78,54 @@ class ThreeMeshCircuit extends Circuit {
 
   TheveninEquivalent calculateTheveninEquivalent() {
     // TODO: add calculation logic
-    return TheveninEquivalent(3, 33);
+
+    double theveninVoltage = 0;
+    double theveninResistance = 0;
+
+    if(hasCurrentSource(ThreeMeshCircuitIdentifier.branch6) &&
+        hasCurrentSource(ThreeMeshCircuitIdentifier.branch7)) {
+      //TODO: implement this case
+      theveninResistance = 33.33;
+      theveninVoltage = 33.33;
+    } else {
+      // 1 CUT IN LEFT AND CALCULATE EQUIV
+      TwoMeshCircuit aux = TwoMeshCircuit();
+      aux.branch1 = CircuitBranch(); // empty
+      aux.branch2 = CircuitBranch(); // empty
+      aux.branch3 = branch6;
+      aux.branch4 = branch7;
+
+      TheveninEquivalent auxEquiv = aux.calculateTheveninEquivalent();
+
+      // PASTE TO THE MISSING PIECE
+
+      TwoMeshCircuit aux2 = TwoMeshCircuit();
+      aux2.branch1 = branch1; // empty
+      aux2.branch2 = branch2; // empty
+      aux2.branch3 = branch3;
+
+      aux2.branch4 = CircuitBranch();
+      aux2.branch4.currentSources = [
+        ...branch4.currentSources,
+        ...branch5.currentSources
+      ];
+      aux2.branch4.voltageSources = [
+        ...branch4.voltageSources,
+        ...branch5.voltageSources,
+        VoltageSource(Offset(0,0), auxEquiv.voltage.abs(), auxEquiv.voltage < 0 ? -1 : 1)
+      ];
+      aux2.branch4.resistors = [
+        ...branch4.resistors,
+        ...branch5.resistors,
+        Resistor(Offset(0,0), auxEquiv.resistance)
+      ];
+
+      TheveninEquivalent finalEquiv = aux2.calculateTheveninEquivalent();
+      theveninVoltage = finalEquiv.voltage;
+      theveninResistance = finalEquiv.resistance;
+    }
+
+
+    return TheveninEquivalent(theveninVoltage, theveninResistance);
   }
 }
