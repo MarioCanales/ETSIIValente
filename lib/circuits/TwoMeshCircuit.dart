@@ -71,17 +71,17 @@ class TwoMeshCircuit extends Circuit {
     double v3 = 0;
     double v4 = 0;
 
-    for (var voltsource in branch1.voltageSources) {
-      v1 += voltsource.voltage;
+    for (var voltSource in branch1.voltageSources) {
+      v1 += voltSource.voltage * voltSource.sign;
     }
-    for (var voltsource in branch2.voltageSources) {
-      v2 += voltsource.voltage;
+    for (var voltSource in branch2.voltageSources) {
+      v2 += voltSource.voltage * voltSource.sign;
     }
-    for (var voltsource in branch3.voltageSources) {
-      v3 += voltsource.voltage;
+    for (var voltSource in branch3.voltageSources) {
+      v3 += voltSource.voltage * voltSource.sign;
     }
-    for (var voltsource in branch4.voltageSources) {
-      v4 += voltsource.voltage;
+    for (var voltSource in branch4.voltageSources) {
+      v4 += voltSource.voltage * voltSource.sign;
     }
 
     // As per Alfonso doc
@@ -110,7 +110,7 @@ class TwoMeshCircuit extends Circuit {
       theveninVoltage += ir4*r3+v3;
     } else {
       double i = (-v3 + v4)/(r3+r4);
-      theveninVoltage += r3*i+v3; // DEBERIA SER SOLO IGUAL?
+      theveninVoltage += r3*i+v3;
     }
 
 

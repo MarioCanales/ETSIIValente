@@ -77,16 +77,45 @@ class ThreeMeshCircuit extends Circuit {
   }
 
   TheveninEquivalent calculateTheveninEquivalent() {
-    // TODO: add calculation logic
 
     double theveninVoltage = 0;
     double theveninResistance = 0;
 
     if(hasCurrentSource(ThreeMeshCircuitIdentifier.branch6) &&
         hasCurrentSource(ThreeMeshCircuitIdentifier.branch7)) {
-      //TODO: implement this case
-      theveninResistance = 33.33;
-      theveninVoltage = 33.33;
+
+      double r1 = 0;
+      double r2 = 0;
+      double r3 = 0;
+      for (var resistor in branch1.resistors) {
+        r1 += resistor.resistance;
+      }
+      for (var resistor in branch2.resistors) {
+        r2 += resistor.resistance;
+      }
+      for (var resistor in branch3.resistors) {
+        r3 += resistor.resistance;
+      }
+
+      double i3 = (branch6.currentSources.first.current * branch6.currentSources.first.sign) +
+          (branch7.currentSources.first.current * branch7.currentSources.first.sign);
+
+      double v1 = 0;
+      double v2 = 0;
+      double v3 = 0;
+
+      for (var voltSource in branch1.voltageSources) {
+        v1 += voltSource.voltage * voltSource.sign;
+      }
+      for (var voltSource in branch2.voltageSources) {
+        v2 += voltSource.voltage * voltSource.sign;
+      }
+      for (var voltSource in branch3.voltageSources) {
+        v3 += voltSource.voltage * voltSource.sign;
+      }
+
+      theveninResistance = r1 + r2 + r3;
+      theveninVoltage = v1 + v2 + v3 + (r3*i3);
     } else {
       // 1 CUT IN LEFT AND CALCULATE EQUIV
       TwoMeshCircuit aux = TwoMeshCircuit();

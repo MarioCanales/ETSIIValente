@@ -262,10 +262,19 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
         component.resistance = newValue;
         branch.resistors.add(component); // new values
       } else if (component is CurrentSource) {
-        component.current = newValue;
+        // If value < 0 change sign
+        int sign = newValue > 0
+            ? component.sign
+            : (-1 * component.sign);
+        component.current = newValue.abs();
+        component.sign = sign;
         branch.currentSources.add(component);
       } else if (component is VoltageSource) {
-        component.voltage = newValue;
+        int sign = newValue > 0
+            ? component.sign
+            : (-1 * component.sign);
+        component.voltage = newValue.abs();
+        component.sign = sign;
         branch.voltageSources.add(component);
       }
     });
@@ -438,11 +447,17 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
           branch.resistors.add(Resistor(adjustedPosition, value));
           resistors.add(Resistor(adjustedPosition, value));
         } else if (selectedComponent == SelectedComponent.voltageSource) {
-          branch.voltageSources.add(VoltageSource(adjustedPosition, value, 1));
-          voltageSources.add(VoltageSource(adjustedPosition, value, 1));
+          int sign = value < 0
+              ? -1
+              : 1;
+          branch.voltageSources.add(VoltageSource(adjustedPosition, value.abs(), sign));
+          voltageSources.add(VoltageSource(adjustedPosition, value.abs(), sign));
         } else {
-          branch.currentSources.add(CurrentSource(adjustedPosition, value, 1));
-          currentSources.add(CurrentSource(adjustedPosition, value, 1));
+          int sign = value < 0
+              ? -1
+              : 1;
+          branch.currentSources.add(CurrentSource(adjustedPosition, value.abs(), sign));
+          currentSources.add(CurrentSource(adjustedPosition, value.abs(), sign));
         }
       });
     }
