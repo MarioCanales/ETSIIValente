@@ -312,6 +312,8 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
         target == ThreeMeshCircuitIdentifier.branch2) {
       message =
       "No se puede colocar una fuente de intensidad en una rama abierta";
+    } else if (circuit.hasCurrentSource(target)) {
+      message = "Ya hay una fuente de intensidad en esta rama";
     } else if (currentSources.length == 2) {
       message =
       "No se pueden colocar más fuentes de intensidad. El máximo de fuentes de intensidad en este circuito es de 2.";

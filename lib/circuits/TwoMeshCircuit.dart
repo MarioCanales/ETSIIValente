@@ -98,6 +98,7 @@ class TwoMeshCircuit extends Circuit {
       theveninResistance += (r3*r4)/(r3+r4);
     }
 
+    // Voltage calculation
     double theveninVoltage = v1 + v2;
     if(hasCurrentSource(TwoMeshCircuitIdentifier.branch3)) {
       // Caclulate VR4 and add
@@ -111,7 +112,7 @@ class TwoMeshCircuit extends Circuit {
       double i = (-v3 + v4)/(r3+r4);
       theveninVoltage += r3*i+v3; // DEBERIA SER SOLO IGUAL?
     }
-    // Voltage calculation
+
 
     // TODO: add voltage calculation logic
     return TheveninEquivalent(theveninVoltage, theveninResistance);
