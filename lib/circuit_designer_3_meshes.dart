@@ -624,36 +624,36 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
               ),
             ),
           ),
-          Container(
-            alignment: Alignment.bottomRight,
-            padding: EdgeInsets.only(right: 40.0, bottom: 40.0),
-            child: ElevatedButton(
-                onPressed: () async {
-                  // Test deserializing
-                  /*
-                  // Use file picker to get the file path where the data is be saved.
-                  String? filePath = await FileUtils.selectFile();
-                  // Read the serialized JSON data to the selected file.
-                  if (filePath != null) {
-                    String? data = await FileUtils.readFromFile(filePath);
-                    setState(() {
-                      circuit = ThreeMeshCircuit.fromJson(data!);
-                      resistors = circuit.getResistors();
-                      currentSources = circuit.getCurrentSources();
-                      voltageSources = circuit.getVoltageSources();
-                    });
-                  } else {
-                    print('No file selected.');
-                  }
-                  */
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              TheveninWindow(circuit: circuit)));
-                },
-                child: const Text('Calcular equivalente Thevenin',
-                    style: TextStyle(color: Colors.brown))),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                TheveninWindow(circuit: circuit)));
+                  },
+                  child: const Text('Calcular equivalente',
+                      style: TextStyle(color: Colors.brown))),
+              SizedBox(height: 15),
+              ElevatedButton(
+                  onPressed: () async {
+                    // Use file picker to get the file path where the data will be saved.
+                    String? filePath = await FileUtils.selectSaveFile();
+                    // Write the serialized JSON data to the selected file.
+                    if (filePath != null) {
+                      await FileUtils.writeToFile(filePath, circuit.toJson());
+                      print('Data saved to file: $filePath');
+                    } else {
+                      print('No file selected.');
+                    }
+                  },
+                  child: const Text('Exportar',
+                      style: TextStyle(color: Colors.brown))),
+              SizedBox(height: 10)
+            ],
           )
         ],
       ),

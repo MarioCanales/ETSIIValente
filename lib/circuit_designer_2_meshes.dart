@@ -5,6 +5,7 @@ import 'package:ETSIIValente/electricComponents/current_source.dart';
 import 'package:ETSIIValente/electricComponents/electric_component.dart';
 import 'package:ETSIIValente/thevenin_window.dart';
 import 'package:ETSIIValente/utils/circuitUtils.dart';
+import 'package:ETSIIValente/utils/fileUtils.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:typed_data';
@@ -572,31 +573,36 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
               ),
             ),
           ),
-          Container(
-            alignment: Alignment.bottomRight,
-            padding: EdgeInsets.only(right: 40.0, bottom: 40.0),
-            child: ElevatedButton(
-                onPressed: () async {
-                  /*Test serializing
-                  // Use file picker to get the file path where the data will be saved.
-                  String? filePath = await FileUtils.selectSaveFile();
-
-                  // Write the serialized JSON data to the selected file.
-                  if (filePath != null) {
-                    await FileUtils.writeToFile(filePath, circuit.toJson());
-                    print('Data saved to file: $filePath');
-                  } else {
-                    print('No file selected.');
-                  }
-                  */
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              TheveninWindow(circuit: circuit)));
-                },
-                child: const Text('Calcular equivalente Thevenin',
-                    style: TextStyle(color: Colors.brown))),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                TheveninWindow(circuit: circuit)));
+                  },
+                  child: const Text('Calcular equivalente',
+                      style: TextStyle(color: Colors.brown))),
+              SizedBox(height: 15),
+              ElevatedButton(
+                  onPressed: () async {
+                    // Use file picker to get the file path where the data will be saved.
+                    String? filePath = await FileUtils.selectSaveFile();
+                    // Write the serialized JSON data to the selected file.
+                    if (filePath != null) {
+                      await FileUtils.writeToFile(filePath, circuit.toJson());
+                      print('Data saved to file: $filePath');
+                    } else {
+                      print('No file selected.');
+                    }
+                  },
+                  child: const Text('Exportar',
+                      style: TextStyle(color: Colors.brown))),
+              SizedBox(height: 10)
+            ],
           )
         ],
       ),
