@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import '../circuitComponents/CircuitMesh.dart';
 import '../circuitComponents/TheveninEquivalent.dart';
 import 'Circuit.dart';
@@ -32,6 +35,28 @@ class TwoMeshCircuit extends Circuit {
     } else {
       return branch4;
     }
+  }
+
+  /// Serialize the circuit to a JSON string.
+  String toJson() {
+    return jsonEncode({
+      'type': 'TwoMeshCircuit',
+      'branch1': branch1.toJson(),
+      'branch2': branch2.toJson(),
+      'branch3': branch3.toJson(),
+      'branch4': branch4.toJson(),
+    });
+  }
+
+  /// Deserialize the circuit from a JSON string.
+  static TwoMeshCircuit fromJson(String json) {
+    Map<String, dynamic> map = jsonDecode(json);
+    return TwoMeshCircuit.withComponents(
+      CircuitBranch.fromJson(map['branch1']),
+      CircuitBranch.fromJson(map['branch2']),
+      CircuitBranch.fromJson(map['branch3']),
+      CircuitBranch.fromJson(map['branch4']),
+    );
   }
 
   bool hasCurrentSource(TwoMeshCircuitIdentifier id) {
@@ -112,9 +137,7 @@ class TwoMeshCircuit extends Circuit {
       double i = (-v3 + v4)/(r3+r4);
       theveninVoltage += r3*i+v3;
     }
-
-
-    // TODO: add voltage calculation logic
     return TheveninEquivalent(theveninVoltage, theveninResistance);
   }
+
 }

@@ -48,4 +48,22 @@ class CircuitBranch {
     }
   }
 
+  /// Serialize the circuit branch to a JSON object.
+  Map<String, dynamic> toJson() {
+    return {
+      'resistors': resistors.map((resistor) => resistor.toJson()).toList(),
+      'voltageSources': voltageSources.map((voltageSource) => voltageSource.toJson()).toList(),
+      'currentSources': currentSources.map((currentSource) => currentSource.toJson()).toList(),
+    };
+  }
+
+  /// Deserialize the circuit branch from a JSON object.
+  static CircuitBranch fromJson(Map<String, dynamic> json) {
+    return CircuitBranch.withComponents(
+      json['resistors'].map<Resistor>((resistorJson) => Resistor.fromJson(resistorJson)).toList(),
+      json['voltageSources'].map<VoltageSource>((voltageSourceJson) => VoltageSource.fromJson(voltageSourceJson)).toList(),
+      json['currentSources'].map<CurrentSource>((currentSourceJson) => CurrentSource.fromJson(currentSourceJson)).toList(),
+    );
+  }
+
 }

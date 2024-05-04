@@ -91,5 +91,21 @@ class Resistor extends ElectricComponent {
     }
     return value; // Return as is if already in ohms
   }
+
+  // Implement fromJson method
+  static Resistor fromJson(Map<String, dynamic> json) {
+    return Resistor(
+      Offset(json['position']['dx'], json['position']['dy']),
+      json['resistance'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': 'Resistor',
+      'position': {'dx': position.dx, 'dy': position.dy},
+      'resistance': resistance,
+    };
+  }
 }
 

@@ -5,6 +5,7 @@ import 'package:ETSIIValente/electricComponents/current_source.dart';
 import 'package:ETSIIValente/electricComponents/electric_component.dart';
 import 'package:ETSIIValente/thevenin_window.dart';
 import 'package:ETSIIValente/utils/circuitUtils.dart';
+import 'package:ETSIIValente/utils/fileUtils.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:typed_data';
@@ -565,7 +566,20 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
             alignment: Alignment.bottomRight,
             padding: EdgeInsets.only(right: 40.0, bottom: 40.0),
             child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  // Test serializing
+                  // Use file picker to get the file path where the data will be saved.
+                  String? filePath = await FileUtils.selectSaveFile();
+
+                  // Write the serialized JSON data to the selected file.
+                  if (filePath != null) {
+                    await FileUtils.writeToFile(filePath, circuit.toJson());
+                    print('Data saved to file: $filePath');
+                  } else {
+                    print('No file selected.');
+                  }
+
+                  // Usual behaivour
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -605,6 +619,7 @@ class CircuitPainter extends CustomPainter {
     for (var line in lines) {
       line.draw(canvas, paint);
     }
+
     // Check that at least an image is loaded
     if (resistorImage != null) {
       resistors.forEach((resistor) => _drawComponent(
@@ -629,6 +644,35 @@ class CircuitPainter extends CustomPainter {
           SelectedComponent.currentSource,
           source.sign));
     }
+    // Draw the letter 'A' next to CircuitLine1
+    TextSpan spanA = const TextSpan(
+      style: TextStyle(color: Colors.black, fontSize: 20),
+      text: 'A',
+    );
+    TextPainter tpA = TextPainter(
+      text: spanA,
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    tpA.layout();
+    double textXA = CircuitParameters.circuitPadding + CircuitParameters.circuitWidth + 10;
+    double textYA = CircuitParameters.circuitPadding - tpA.height / 2; // middle of the letter
+    tpA.paint(canvas, Offset(textXA, textYA));
+
+    // Draw the letter 'B' next to CircuitLine2
+    TextSpan spanB = const TextSpan(
+      style: TextStyle(color: Colors.black, fontSize: 20),
+      text: 'B',
+    );
+    TextPainter tpB = TextPainter(
+      text: spanB,
+      textAlign: TextAlign.center,
+      textDirection: TextDirection.ltr,
+    );
+    tpB.layout();
+    double textXB = CircuitParameters.circuitPadding + CircuitParameters.circuitWidth + 10;
+    double textYB = CircuitParameters.circuitPadding + CircuitParameters.circuitHeight - tpB.height / 2; // middle of the letter
+    tpB.paint(canvas, Offset(textXB, textYB));
   }
 
   void _drawComponent(Canvas canvas, ui.Image image, Offset position,

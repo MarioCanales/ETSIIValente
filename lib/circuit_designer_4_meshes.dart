@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:ETSIIValente/circuitComponents/CircuitLine.dart';
-import 'package:ETSIIValente/circuits/ThreeMeshCircuit.dart';
 import 'package:ETSIIValente/electricComponents/current_source.dart';
 import 'package:ETSIIValente/electricComponents/electric_component.dart';
 import 'package:ETSIIValente/thevenin_window.dart';
@@ -12,6 +11,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'circuitComponents/CircuitMesh.dart';
+import 'circuits/FourMeshCircuit.dart';
 import 'electricComponents/resistor.dart';
 import 'electricComponents/voltage_source.dart';
 
@@ -33,7 +33,7 @@ class CircuitParameters {
     // Top right line
     CircuitLine(
       const Offset(
-          CircuitParameters.circuitPadding + (2*CircuitParameters.circuitWidth) / 3,
+          CircuitParameters.circuitPadding + (3*CircuitParameters.circuitWidth) / 4,
           CircuitParameters.circuitPadding),
       const Offset(
           CircuitParameters.circuitPadding + CircuitParameters.circuitWidth,
@@ -45,7 +45,7 @@ class CircuitParameters {
     // Bottom right line
     CircuitLine(
       const Offset(
-          CircuitParameters.circuitPadding + (2*CircuitParameters.circuitWidth) / 3,
+          CircuitParameters.circuitPadding + (3*CircuitParameters.circuitWidth) / 4,
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
       const Offset(
           CircuitParameters.circuitPadding + CircuitParameters.circuitWidth,
@@ -58,60 +58,98 @@ class CircuitParameters {
     CircuitLine(
       const Offset(
           CircuitParameters.circuitPadding +
-              2*(CircuitParameters.circuitWidth / 3),
+              3*(CircuitParameters.circuitWidth / 4),
           CircuitParameters.circuitPadding),
       const Offset(
           CircuitParameters.circuitPadding +
-              2*(CircuitParameters.circuitWidth / 3),
+              3*(CircuitParameters.circuitWidth / 4),
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
     )
   ];
 
   static List<CircuitLine> CircuitLinesBranch4 = [
-    // middle top line
+    // middle top line right
     CircuitLine(
       const Offset(
-          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3,
+          CircuitParameters.circuitPadding + 2 * (CircuitParameters.circuitWidth / 4),
           CircuitParameters.circuitPadding),
       const Offset(
-          CircuitParameters.circuitPadding + 2*(CircuitParameters.circuitWidth/3),
+          CircuitParameters.circuitPadding + 3*(CircuitParameters.circuitWidth)/4,
           CircuitParameters.circuitPadding),
     ),
   ];
 
   static List<CircuitLine> CircuitLinesBranch5 = [
-    // middle bottom line
+    // middle bottom line right
     CircuitLine(
       const Offset(
-          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3,
+          CircuitParameters.circuitPadding + 2 * (CircuitParameters.circuitWidth / 4),
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
       const Offset(
-          CircuitParameters.circuitPadding + 2*(CircuitParameters.circuitWidth/3),
+          CircuitParameters.circuitPadding + 3*(CircuitParameters.circuitWidth/4),
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
     ),
   ];
 
   static List<CircuitLine> CircuitLinesBranch6 = [
-    // left Middle vertical line
+    // Middle right vertical line
     CircuitLine(
       const Offset(
           CircuitParameters.circuitPadding +
-              (CircuitParameters.circuitWidth / 3),
+              2 * (CircuitParameters.circuitWidth / 4),
           CircuitParameters.circuitPadding),
       const Offset(
           CircuitParameters.circuitPadding +
-              (CircuitParameters.circuitWidth / 3),
+              2 * (CircuitParameters.circuitWidth / 4),
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
     )
   ];
 
   static List<CircuitLine> CircuitLinesBranch7 = [
+    // middle top line left
+    CircuitLine(
+      const Offset(
+          CircuitParameters.circuitPadding +  (CircuitParameters.circuitWidth / 4),
+          CircuitParameters.circuitPadding),
+      const Offset(
+          CircuitParameters.circuitPadding + 2 * (CircuitParameters.circuitWidth)/4,
+          CircuitParameters.circuitPadding),
+    ),
+  ];
+
+  static List<CircuitLine> CircuitLinesBranch8 = [
+    // middle bottom line right
+    CircuitLine(
+      const Offset(
+          CircuitParameters.circuitPadding + (CircuitParameters.circuitWidth / 4),
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+      const Offset(
+          CircuitParameters.circuitPadding + 3*(CircuitParameters.circuitWidth/4),
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+    ),
+  ];
+
+  static List<CircuitLine> CircuitLinesBranch9 = [
+    // Middle left vertical line
+    CircuitLine(
+      const Offset(
+          CircuitParameters.circuitPadding +
+              1 * (CircuitParameters.circuitWidth / 4),
+          CircuitParameters.circuitPadding),
+      const Offset(
+          CircuitParameters.circuitPadding +
+              1 * (CircuitParameters.circuitWidth / 4),
+          CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
+    )
+  ];
+
+  static List<CircuitLine> CircuitLinesBranch10 = [
     // Top left line
     CircuitLine(
       const Offset(
           CircuitParameters.circuitPadding, CircuitParameters.circuitPadding),
       const Offset(
-          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3,
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 4,
           CircuitParameters.circuitPadding),
     ),
     // Bottom left line
@@ -119,7 +157,7 @@ class CircuitParameters {
       const Offset(CircuitParameters.circuitPadding,
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
       const Offset(
-          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3,
+          CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 4,
           CircuitParameters.circuitPadding + CircuitParameters.circuitHeight),
     ),
     // Left vertical line
@@ -131,14 +169,17 @@ class CircuitParameters {
     ),
   ];
 
-  static Map<ThreeMeshCircuitIdentifier, List<CircuitLine>> BranchsLinesMap = {
-    ThreeMeshCircuitIdentifier.branch1: CircuitLinesBranch1,
-    ThreeMeshCircuitIdentifier.branch2: CircuitLinesBranch2,
-    ThreeMeshCircuitIdentifier.branch3: CircuitLinesBranch3,
-    ThreeMeshCircuitIdentifier.branch4: CircuitLinesBranch4,
-    ThreeMeshCircuitIdentifier.branch5: CircuitLinesBranch5,
-    ThreeMeshCircuitIdentifier.branch6: CircuitLinesBranch6,
-    ThreeMeshCircuitIdentifier.branch7: CircuitLinesBranch7
+  static Map<FourMeshCircuitIdentifier, List<CircuitLine>> BranchsLinesMap = {
+    FourMeshCircuitIdentifier.branch1: CircuitLinesBranch1,
+    FourMeshCircuitIdentifier.branch2: CircuitLinesBranch2,
+    FourMeshCircuitIdentifier.branch3: CircuitLinesBranch3,
+    FourMeshCircuitIdentifier.branch4: CircuitLinesBranch4,
+    FourMeshCircuitIdentifier.branch5: CircuitLinesBranch5,
+    FourMeshCircuitIdentifier.branch6: CircuitLinesBranch6,
+    FourMeshCircuitIdentifier.branch7: CircuitLinesBranch7,
+    FourMeshCircuitIdentifier.branch8: CircuitLinesBranch8,
+    FourMeshCircuitIdentifier.branch9: CircuitLinesBranch9,
+    FourMeshCircuitIdentifier.branch10: CircuitLinesBranch10
   };
 
   static List<CircuitLine> CircuitLines = [
@@ -148,17 +189,20 @@ class CircuitParameters {
     ...CircuitLinesBranch4,
     ...CircuitLinesBranch5,
     ...CircuitLinesBranch6,
-    ...CircuitLinesBranch7
+    ...CircuitLinesBranch7,
+    ...CircuitLinesBranch8,
+    ...CircuitLinesBranch9,
+    ...CircuitLinesBranch10
   ];
 }
 
-class CircuitDesigner3Meshes extends StatefulWidget {
+class CircuitDesigner4Meshes extends StatefulWidget {
   @override
-  _CircuitDesigner3MeshesState createState() => _CircuitDesigner3MeshesState();
+  _CircuitDesigner4MeshesState createState() => _CircuitDesigner4MeshesState();
 }
 
-class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
-  ThreeMeshCircuit circuit = ThreeMeshCircuit();
+class _CircuitDesigner4MeshesState extends State<CircuitDesigner4Meshes> {
+  FourMeshCircuit circuit = FourMeshCircuit();
   // it makes sense to have a overall list of components though to simplify
   // Draw features
   List<Resistor> resistors = [];
@@ -188,7 +232,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
     ui.decodeImageFromList(bytes, callback);
   }
 
-  ThreeMeshCircuitIdentifier? _isTapOnBorder(Offset tapPosition) {
+  FourMeshCircuitIdentifier? _isTapOnBorder(Offset tapPosition) {
     // Iterate map to return the specific branch or "None"
     for (var branch in CircuitParameters.BranchsLinesMap.entries) {
       for (CircuitLine line in branch.value) {
@@ -254,7 +298,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
   }
 
   void _updateComponentValue(ElectricComponent component, double newValue,
-      ThreeMeshCircuitIdentifier meshCircuitIdentifier) {
+      FourMeshCircuitIdentifier meshCircuitIdentifier) {
     CircuitBranch branch = circuit.getBranch(meshCircuitIdentifier);
     branch.deleteComponent(component);
     setState(() {
@@ -281,7 +325,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
   }
 
   void _rotateComponent(ElectricComponent component,
-      ThreeMeshCircuitIdentifier meshCircuitIdentifier) {
+      FourMeshCircuitIdentifier meshCircuitIdentifier) {
     CircuitBranch branch = circuit.getBranch(meshCircuitIdentifier);
     branch.deleteComponent(component);
     setState(() {
@@ -296,7 +340,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
   }
 
   void _deleteComponent(ElectricComponent component,
-      ThreeMeshCircuitIdentifier meshCircuitIdentifier) {
+      FourMeshCircuitIdentifier meshCircuitIdentifier) {
     CircuitBranch branch = circuit.getBranch(meshCircuitIdentifier);
     print("List2 - Before delete: ${branch.currentSources.length} sources");
     // List used for calculation
@@ -315,23 +359,42 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
   }
 
   Future<bool> _validateCurrentSourceAddition(
-      ThreeMeshCircuit circuit, ThreeMeshCircuitIdentifier target) async {
+      FourMeshCircuit circuit, FourMeshCircuitIdentifier target) async {
     String? message;
-    if (target == ThreeMeshCircuitIdentifier.branch1 ||
-        target == ThreeMeshCircuitIdentifier.branch2) {
+    if (target == FourMeshCircuitIdentifier.branch1 ||
+        target == FourMeshCircuitIdentifier.branch2) {
       message =
       "No se puede colocar una fuente de intensidad en una rama abierta";
     } else if (circuit.hasCurrentSource(target)) {
       message = "Ya hay una fuente de intensidad en esta rama";
-    } else if (currentSources.length == 2) {
+    } else if (currentSources.length == 3) {
       message =
-      "No se pueden colocar más fuentes de intensidad. El máximo de fuentes de intensidad en este circuito es de 2.";
-    } else if ((target == ThreeMeshCircuitIdentifier.branch3 ||target == ThreeMeshCircuitIdentifier.branch4 || target == ThreeMeshCircuitIdentifier.branch5)
-        && (circuit.hasCurrentSource(ThreeMeshCircuitIdentifier.branch3) || circuit.hasCurrentSource(ThreeMeshCircuitIdentifier.branch4) || circuit.hasCurrentSource(ThreeMeshCircuitIdentifier.branch5))
+      "No se pueden colocar más fuentes de intensidad. El máximo de fuentes de intensidad en este circuito es de 3.";
+    } else if ((target == FourMeshCircuitIdentifier.branch3 ||target == FourMeshCircuitIdentifier.branch4 || target == FourMeshCircuitIdentifier.branch5)
+        && (circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch3) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch4) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch5))
     ) {
       message =
       "No se puede colocar una fuente de intensidad aquí. Hay una fuente en una rama cercana";
+    } else if ((target == FourMeshCircuitIdentifier.branch6 ||target == FourMeshCircuitIdentifier.branch7 || target == FourMeshCircuitIdentifier.branch8)
+        && (circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch6) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch7) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch8))
+    ) {
+      message =
+      "No se puede colocar una fuente de intensidad aquí. Hay una fuente en una rama cercana";
+    } else if (currentSources.length == 1) {
+      // TODO: implementar condicionalidad de grupos, (3,4,5), (7,8) + anterior por la izq
+      message =
+      "";
+    } else if (currentSources.length == 1) {
+      // TODO: caso anterior por la izquierda
+      message =
+      ".";
+    } else if (currentSources.length == 2) {
+      // TODO: ultimo caso, 3 ifs,
+      message =
+      ".";
     }
+    // Implement : 2 resistencias, ver caso anterior para la izquierda
+    // 3 -> grupos (3,4,5), (6), (7,8)
 
     if (message != null) {
       // Validation error
@@ -563,7 +626,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
           Expanded(
             child: GestureDetector(
               onTapDown: (TapDownDetails details) async {
-                ThreeMeshCircuitIdentifier? branchIdentifier =
+                FourMeshCircuitIdentifier? branchIdentifier =
                 _isTapOnBorder(details.localPosition);
                 if (branchIdentifier != null) {
                   print("Tap is on branch $branchIdentifier");
@@ -716,8 +779,9 @@ class CircuitPainter extends CustomPainter {
       double value, SelectedComponent selectedComponent, int sign) {
     bool isVerticalLine =
         position.dx == CircuitParameters.circuitPadding || // Left vertical line
-        position.dx == CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 3 ||
-        position.dx == CircuitParameters.circuitPadding + 2*CircuitParameters.circuitWidth / 3
+            position.dx == CircuitParameters.circuitPadding + CircuitParameters.circuitWidth / 4 ||
+            position.dx == CircuitParameters.circuitPadding + 2*CircuitParameters.circuitWidth / 4 ||
+            position.dx == CircuitParameters.circuitPadding + 3*CircuitParameters.circuitWidth / 4
     ;
     bool isBottom = position.dy ==
         CircuitParameters.circuitPadding + CircuitParameters.circuitHeight;

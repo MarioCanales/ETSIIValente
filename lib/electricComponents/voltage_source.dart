@@ -101,4 +101,22 @@ class VoltageSource extends ElectricComponent {
     }
     return value; // Return as is if already in volts
   }
+
+  // Implement fromJson method
+  static VoltageSource fromJson(Map<String, dynamic> json) {
+    return VoltageSource(
+      Offset(json['position']['dx'], json['position']['dy']),
+      json['voltage'],
+      json['sign'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': 'VoltageSource',
+      'position': {'dx': position.dx, 'dy': position.dy},
+      'voltage': voltage,
+      'sign': sign,
+    };
+  }
 }

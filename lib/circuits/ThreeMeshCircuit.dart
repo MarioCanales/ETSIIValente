@@ -1,5 +1,5 @@
 
-
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:ETSIIValente/electricComponents/voltage_source.dart';
@@ -56,6 +56,34 @@ class ThreeMeshCircuit extends Circuit {
     } else {
       return branch7;
     }
+  }
+
+  /// Serialize the circuit to a JSON string.
+  String toJson() {
+    return jsonEncode({
+      'type': 'ThreeMeshCircuit',
+      'branch1': branch1.toJson(),
+      'branch2': branch2.toJson(),
+      'branch3': branch3.toJson(),
+      'branch4': branch4.toJson(),
+      'branch5': branch5.toJson(),
+      'branch6': branch6.toJson(),
+      'branch7': branch7.toJson()
+    });
+  }
+
+  /// Deserialize the circuit from a JSON string.
+  static ThreeMeshCircuit fromJson(String json) {
+    Map<String, dynamic> map = jsonDecode(json);
+    return ThreeMeshCircuit.withComponents(
+      CircuitBranch.fromJson(map['branch1']),
+      CircuitBranch.fromJson(map['branch2']),
+      CircuitBranch.fromJson(map['branch3']),
+      CircuitBranch.fromJson(map['branch4']),
+      CircuitBranch.fromJson(map['branch5']),
+      CircuitBranch.fromJson(map['branch6']),
+      CircuitBranch.fromJson(map['branch7'])
+    );
   }
 
   bool hasCurrentSource(ThreeMeshCircuitIdentifier id) {

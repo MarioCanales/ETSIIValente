@@ -100,5 +100,24 @@ class CurrentSource extends ElectricComponent {
     }
     return value;
   }
+
+  // Implement fromJson method
+  static CurrentSource fromJson(Map<String, dynamic> json) {
+    return CurrentSource(
+      Offset(json['position']['dx'], json['position']['dy']),
+      json['current'],
+      json['sign'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'type': 'CurrentSource',
+      'position': {'dx': position.dx, 'dy': position.dy},
+      'current': current,
+      'sign': sign,
+    };
+  }
+
 }
 

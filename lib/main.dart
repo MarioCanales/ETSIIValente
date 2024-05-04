@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'circuit_designer_2_meshes.dart';
 import 'circuit_designer_3_meshes.dart';
+import 'circuit_designer_4_meshes.dart';
 
 void main() {
   runApp(const MyApp());
@@ -118,6 +119,13 @@ class HomeScreen extends StatelessWidget {
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner3Meshes()));
+                  },
+                ),
+                GestureDetector(
+                  child: Text('4 Mallas'),
+                  onTap: () {
+                    Navigator.of(context).pop();
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner4Meshes()));
                   },
                 ),
               ],
