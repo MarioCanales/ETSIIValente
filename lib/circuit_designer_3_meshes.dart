@@ -6,6 +6,7 @@ import 'package:ETSIIValente/electricComponents/current_source.dart';
 import 'package:ETSIIValente/electricComponents/electric_component.dart';
 import 'package:ETSIIValente/thevenin_window.dart';
 import 'package:ETSIIValente/utils/circuitUtils.dart';
+import 'package:ETSIIValente/utils/fileUtils.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:typed_data';
@@ -616,7 +617,24 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
             alignment: Alignment.bottomRight,
             padding: EdgeInsets.only(right: 40.0, bottom: 40.0),
             child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  // Test deserializing
+                  /*
+                  // Use file picker to get the file path where the data is be saved.
+                  String? filePath = await FileUtils.selectFile();
+                  // Read the serialized JSON data to the selected file.
+                  if (filePath != null) {
+                    String? data = await FileUtils.readFromFile(filePath);
+                    setState(() {
+                      circuit = ThreeMeshCircuit.fromJson(data!);
+                      resistors = circuit.getResistors();
+                      currentSources = circuit.getCurrentSources();
+                      voltageSources = circuit.getVoltageSources();
+                    });
+                  } else {
+                    print('No file selected.');
+                  }
+                  */
                   Navigator.push(
                       context,
                       MaterialPageRoute(

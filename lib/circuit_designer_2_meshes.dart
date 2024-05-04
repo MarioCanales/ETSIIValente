@@ -567,7 +567,7 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
             padding: EdgeInsets.only(right: 40.0, bottom: 40.0),
             child: ElevatedButton(
                 onPressed: () async {
-                  // Test serializing
+                  /*Test serializing
                   // Use file picker to get the file path where the data will be saved.
                   String? filePath = await FileUtils.selectSaveFile();
 
@@ -578,8 +578,7 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
                   } else {
                     print('No file selected.');
                   }
-
-                  // Usual behaivour
+                  */
                   Navigator.push(
                       context,
                       MaterialPageRoute(

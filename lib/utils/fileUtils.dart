@@ -16,8 +16,8 @@ class FileUtils {
     // Use file picker to allow the user to select a file
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['.json'],
-      dialogTitle: 'Save Circuit Data',
+      allowedExtensions: ['json'],
+      dialogTitle: 'Cargar circuito',
     );
 
     if (result != null) {
@@ -32,5 +32,18 @@ class FileUtils {
     // Write the serialized JSON data to the selected file.
     File file = File(filePath);
     await file.writeAsString(jsonData);
+  }
+
+
+  static Future<String?> readFromFile(String filePath) async {
+    try {
+      // Read the contents of the file.
+      File file = File(filePath);
+      String contents = await file.readAsString();
+      return contents;
+    } catch (e) {
+      print('Error reading from file: $e');
+      return null;
+    }
   }
 }

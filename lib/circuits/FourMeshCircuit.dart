@@ -2,6 +2,9 @@ import 'dart:convert';
 
 import '../circuitComponents/CircuitMesh.dart';
 import '../circuitComponents/TheveninEquivalent.dart';
+import '../electricComponents/current_source.dart';
+import '../electricComponents/resistor.dart';
+import '../electricComponents/voltage_source.dart';
 import 'Circuit.dart';
 
 enum FourMeshCircuitIdentifier { branch1, branch2, branch3, branch4, branch5, branch6, branch7, branch8, branch9, branch10}
@@ -100,6 +103,51 @@ class FourMeshCircuit extends Circuit {
         CircuitBranch.fromJson(map['branch9']),
         CircuitBranch.fromJson(map['branch10'])
     );
+  }
+
+  List<Resistor> getResistors() {
+    return [
+      ...branch1.resistors,
+      ...branch2.resistors,
+      ...branch3.resistors,
+      ...branch4.resistors,
+      ...branch5.resistors,
+      ...branch6.resistors,
+      ...branch7.resistors,
+      ...branch8.resistors,
+      ...branch9.resistors,
+      ...branch10.resistors,
+    ];
+  }
+
+  List<CurrentSource> getCurrentSources() {
+    return [
+      ...branch1.currentSources,
+      ...branch2.currentSources,
+      ...branch3.currentSources,
+      ...branch4.currentSources,
+      ...branch5.currentSources,
+      ...branch6.currentSources,
+      ...branch7.currentSources,
+      ...branch8.currentSources,
+      ...branch9.currentSources,
+      ...branch10.currentSources,
+    ];
+  }
+
+  List<VoltageSource> getVoltageSources() {
+    return [
+      ...branch1.voltageSources,
+      ...branch2.voltageSources,
+      ...branch3.voltageSources,
+      ...branch4.voltageSources,
+      ...branch5.voltageSources,
+      ...branch6.voltageSources,
+      ...branch7.voltageSources,
+      ...branch8.voltageSources,
+      ...branch9.voltageSources,
+      ...branch10.voltageSources,
+    ];
   }
 
   bool hasCurrentSource(FourMeshCircuitIdentifier id) {

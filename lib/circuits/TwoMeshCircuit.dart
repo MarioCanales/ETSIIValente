@@ -3,6 +3,9 @@ import 'dart:io';
 
 import '../circuitComponents/CircuitMesh.dart';
 import '../circuitComponents/TheveninEquivalent.dart';
+import '../electricComponents/current_source.dart';
+import '../electricComponents/resistor.dart';
+import '../electricComponents/voltage_source.dart';
 import 'Circuit.dart';
 
 enum TwoMeshCircuitIdentifier { branch1, branch2, branch3, branch4}
@@ -57,6 +60,33 @@ class TwoMeshCircuit extends Circuit {
       CircuitBranch.fromJson(map['branch3']),
       CircuitBranch.fromJson(map['branch4']),
     );
+  }
+
+  List<Resistor> getResistors() {
+    return [
+      ...branch1.resistors,
+      ...branch2.resistors,
+      ...branch3.resistors,
+      ...branch4.resistors
+    ];
+  }
+
+  List<CurrentSource> getCurrentSources() {
+    return [
+      ...branch1.currentSources,
+      ...branch2.currentSources,
+      ...branch3.currentSources,
+      ...branch4.currentSources,
+    ];
+  }
+
+  List<VoltageSource> getVoltageSources() {
+    return [
+      ...branch1.voltageSources,
+      ...branch2.voltageSources,
+      ...branch3.voltageSources,
+      ...branch4.voltageSources,
+    ];
   }
 
   bool hasCurrentSource(TwoMeshCircuitIdentifier id) {

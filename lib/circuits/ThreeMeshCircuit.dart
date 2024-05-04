@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:ETSIIValente/electricComponents/current_source.dart';
 import 'package:ETSIIValente/electricComponents/voltage_source.dart';
 
 import '../circuitComponents/CircuitMesh.dart';
@@ -84,6 +85,42 @@ class ThreeMeshCircuit extends Circuit {
       CircuitBranch.fromJson(map['branch6']),
       CircuitBranch.fromJson(map['branch7'])
     );
+  }
+
+  List<Resistor> getResistors() {
+    return [
+      ...branch1.resistors,
+      ...branch2.resistors,
+      ...branch3.resistors,
+      ...branch4.resistors,
+      ...branch5.resistors,
+      ...branch6.resistors,
+      ...branch7.resistors,
+    ];
+  }
+
+  List<CurrentSource> getCurrentSources() {
+    return [
+      ...branch1.currentSources,
+      ...branch2.currentSources,
+      ...branch3.currentSources,
+      ...branch4.currentSources,
+      ...branch5.currentSources,
+      ...branch6.currentSources,
+      ...branch7.currentSources,
+    ];
+  }
+
+  List<VoltageSource> getVoltageSources() {
+    return [
+      ...branch1.voltageSources,
+      ...branch2.voltageSources,
+      ...branch3.voltageSources,
+      ...branch4.voltageSources,
+      ...branch5.voltageSources,
+      ...branch6.voltageSources,
+      ...branch7.voltageSources,
+    ];
   }
 
   bool hasCurrentSource(ThreeMeshCircuitIdentifier id) {
