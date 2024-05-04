@@ -624,38 +624,40 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
               ),
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                TheveninWindow(circuit: circuit)));
-                  },
-                  child: const Text('Calcular equivalente',
-                      style: TextStyle(color: Colors.brown))),
-              SizedBox(height: 15),
-              ElevatedButton(
-                  onPressed: () async {
-                    // Use file picker to get the file path where the data will be saved.
-                    String? filePath = await FileUtils.selectSaveFile();
-                    // Write the serialized JSON data to the selected file.
-                    if (filePath != null) {
-                      await FileUtils.writeToFile(filePath, circuit.toJson());
-                      print('Data saved to file: $filePath');
-                    } else {
-                      print('No file selected.');
-                    }
-                  },
-                  child: const Text('Exportar',
-                      style: TextStyle(color: Colors.brown))),
-              SizedBox(height: 10)
-            ],
-          )
         ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              TheveninWindow(circuit: circuit)));
+                },
+                child: const Text('Calcular equivalente',
+                    style: TextStyle(color: Colors.brown))),
+            ElevatedButton(
+                onPressed: () async {
+                  // Use file picker to get the file path where the data will be saved.
+                  String? filePath = await FileUtils.selectSaveFile();
+                  // Write the serialized JSON data to the selected file.
+                  if (filePath != null) {
+                    await FileUtils.writeToFile(filePath, circuit.toJson());
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Circuito guardado en $filePath')));
+                    print('Data saved to file: $filePath');
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Guardado cancelado')));
+                    print('No file selected.');
+                  }
+                },
+                child: const Text('Exportar',
+                    style: TextStyle(color: Colors.brown))),
+          ],
+        ),
       ),
     );
   }
