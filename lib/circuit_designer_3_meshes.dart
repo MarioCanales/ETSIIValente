@@ -154,12 +154,20 @@ class CircuitParameters {
 }
 
 class CircuitDesigner3Meshes extends StatefulWidget {
+  ThreeMeshCircuit circuit;
+
+  CircuitDesigner3Meshes({Key? key, required this.circuit})
+      : super(key: key);
+
   @override
-  _CircuitDesigner3MeshesState createState() => _CircuitDesigner3MeshesState();
+  _CircuitDesigner3MeshesState createState() =>
+      _CircuitDesigner3MeshesState(circuit);
 }
 
 class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
-  ThreeMeshCircuit circuit = ThreeMeshCircuit();
+  ThreeMeshCircuit circuit;
+
+  _CircuitDesigner3MeshesState(this.circuit);
   // it makes sense to have a overall list of components though to simplify
   // Draw features
   List<Resistor> resistors = [];
@@ -175,6 +183,9 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
   @override
   void initState() {
     super.initState();
+    resistors = circuit.getResistors();
+    voltageSources = circuit.getVoltageSources();
+    currentSources = circuit.getCurrentSources();
     _loadImage(
         'assets/resistor.jpg', (img) => setState(() => resistorImage = img));
     _loadImage('assets/voltajeFuente.png',

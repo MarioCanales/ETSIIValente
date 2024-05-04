@@ -1,8 +1,13 @@
+import 'package:ETSIIValente/circuits/FourMeshCircuit.dart';
+import 'package:ETSIIValente/circuits/TwoMeshCircuit.dart';
+import 'package:ETSIIValente/utils/fileUtils.dart';
 import 'package:flutter/material.dart';
 
 import 'circuit_designer_2_meshes.dart';
 import 'circuit_designer_3_meshes.dart';
 import 'circuit_designer_4_meshes.dart';
+import 'circuits/Circuit.dart';
+import 'circuits/ThreeMeshCircuit.dart';
 
 void main() {
   runApp(const MyApp());
@@ -87,9 +92,25 @@ class HomeScreen extends StatelessWidget {
                       )
                     )
                   ),
-                  child: Text('Diseñar', style: TextStyle(color: Colors.white)),
+                  child: Text('Diseñar ', style: TextStyle(color: Colors.white)),
                   onPressed: () {
                     _showMeshSelectionDialog(context);
+                  },
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.brown),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero// No rounded
+                          )
+                      )
+                  ),
+                  child: Text('Importar', style: TextStyle(color: Colors.white)),
+                  onPressed: () {
+                    _handleImport(context);
                   },
                 )
               ],
@@ -111,21 +132,21 @@ class HomeScreen extends StatelessWidget {
                   child: Text('2 Mallas'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner2Meshes()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner2Meshes(circuit: TwoMeshCircuit())));
                   },
                 ),
                 GestureDetector(
                   child: Text('3 Mallas'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner3Meshes()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner3Meshes(circuit: ThreeMeshCircuit())));
                   },
                 ),
                 GestureDetector(
                   child: Text('4 Mallas'),
                   onTap: () {
                     Navigator.of(context).pop();
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner4Meshes()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner4Meshes(circuit: FourMeshCircuit())));
                   },
                 ),
               ],
@@ -134,6 +155,50 @@ class HomeScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _handleImport(BuildContext context) async {
+    // Use file picker to get the file path where the data is be saved.
+    String? filePath = await FileUtils.selectFile();
+    // Read the serialized JSON data to the selected file.
+    if (filePath != null) {
+      try {
+        String? data = await FileUtils.readFromFile(filePath);
+        if(data == null) {
+          throw Exception("Error leyendo el fichero");
+        }
+        Circuit circuit = Circuit.fromJson(data);
+        if (circuit is TwoMeshCircuit) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner2Meshes(circuit: circuit)));
+        } else if (circuit is ThreeMeshCircuit) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner3Meshes(circuit: circuit)));
+        } else if (circuit is FourMeshCircuit) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner4Meshes(circuit: circuit)));
+        } else {
+
+        }
+      } on Exception catch (_) {
+        // Validation error
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Error al importar circuito"),
+                content: Text("El formato del fichero no es valido"),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text("OK"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            });
+      }
+    } else {
+      print('No file selected.');
+    }
   }
 
 }
