@@ -34,6 +34,7 @@ dependencies:
   flutter:
     sdk: flutter
   file_picker: 8.0.0
+  shared_preferences: ^2.2.3
 
 
   # The following adds the Cupertino Icons font to your application.

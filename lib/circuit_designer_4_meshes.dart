@@ -12,6 +12,7 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import 'circuitComponents/CircuitMesh.dart';
+import 'circuits/CircuitManager.dart';
 import 'circuits/FourMeshCircuit.dart';
 import 'electricComponents/resistor.dart';
 import 'electricComponents/voltage_source.dart';
@@ -561,6 +562,63 @@ class _CircuitDesigner4MeshesState extends State<CircuitDesigner4Meshes> {
     }
   }
 
+  void _saveCircuitDialog() {
+    TextEditingController nameController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Guardar Circuito"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: "Nombre del Circuito",
+                ),
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Cancelar"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text("Guardar"),
+              onPressed: () {
+                _saveCircuit(nameController.text);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _saveCircuit(String name) async {
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("El nombre del circuito no puede estar vacío"),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
+    CircuitStoreWrapper circuitWrapper = CircuitStoreWrapper(name: name, circuit: circuit);
+    print("Guardando....");
+    await CircuitManager().addCircuit(circuitWrapper);
+    print("GUARDADO!");
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text("Circuito '$name' guardado correctamente"),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -741,6 +799,12 @@ class _CircuitDesigner4MeshesState extends State<CircuitDesigner4Meshes> {
                   }
                 },
                 child: const Text('Exportar',
+                    style: TextStyle(color: Colors.brown))),
+            ElevatedButton(
+                onPressed: () {
+                  _saveCircuitDialog();
+                },
+                child: const Text('Guardar',
                     style: TextStyle(color: Colors.brown))),
           ],
         ),

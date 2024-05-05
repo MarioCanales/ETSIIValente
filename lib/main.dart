@@ -1,5 +1,6 @@
 import 'package:ETSIIValente/circuits/FourMeshCircuit.dart';
 import 'package:ETSIIValente/circuits/TwoMeshCircuit.dart';
+import 'package:ETSIIValente/saved_circuits.dart';
 import 'package:ETSIIValente/utils/fileUtils.dart';
 import 'package:flutter/material.dart';
 
@@ -7,9 +8,14 @@ import 'circuit_designer_2_meshes.dart';
 import 'circuit_designer_3_meshes.dart';
 import 'circuit_designer_4_meshes.dart';
 import 'circuits/Circuit.dart';
+import 'circuits/CircuitManager.dart';
 import 'circuits/ThreeMeshCircuit.dart';
 
 void main() {
+  // Initialize session
+  WidgetsFlutterBinding.ensureInitialized();
+  CircuitManager();
+
   runApp(const MyApp());
 }
 
@@ -47,8 +53,17 @@ class HomeScreen extends StatelessWidget {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Action for saved circuits
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SavedCircuitsPage()),
+                  );
                 },
+                style:ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero
+                  ),
+                  backgroundColor: Colors.white70
+                ) ,
                 child: Text('Circuitos guardados',
                     style: TextStyle(color: Colors.brown))
               ),
@@ -174,8 +189,6 @@ class HomeScreen extends StatelessWidget {
           Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner3Meshes(circuit: circuit)));
         } else if (circuit is FourMeshCircuit) {
           Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner4Meshes(circuit: circuit)));
-        } else {
-
         }
       } on Exception catch (_) {
         // Validation error
