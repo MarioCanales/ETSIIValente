@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:ui';
+
+import 'package:ETSIIValente/circuits/ThreeMeshCircuit.dart';
 
 import '../circuitComponents/CircuitMesh.dart';
 import '../circuitComponents/TheveninEquivalent.dart';
@@ -6,6 +9,7 @@ import '../electricComponents/current_source.dart';
 import '../electricComponents/resistor.dart';
 import '../electricComponents/voltage_source.dart';
 import 'Circuit.dart';
+import 'TwoMeshCircuit.dart';
 
 enum FourMeshCircuitIdentifier { branch1, branch2, branch3, branch4, branch5, branch6, branch7, branch8, branch9, branch10}
 
@@ -175,7 +179,160 @@ class FourMeshCircuit extends Circuit {
   }
 
   TheveninEquivalent calculateTheveninEquivalent() {
-    // TODO: implement functionality
-    return TheveninEquivalent(44.44, 44.44);
+
+    double theveninResistance = 0;
+    double theveninVoltage = 0;
+
+    double v1 = 0;
+    double v2 = 0;
+    for (var voltSource in branch1.voltageSources) {
+      v1 += voltSource.voltage * voltSource.sign;
+    }
+    for (var voltSource in branch2.voltageSources) {
+      v2 += voltSource.voltage * voltSource.sign;
+    }
+
+    double r1 = 0;
+    double r2 = 0;
+    for (var resistor in branch1.resistors) {
+      r1 += resistor.resistance;
+    }
+    for (var resistor in branch2.resistors) {
+      r2 += resistor.resistance;
+    }
+
+    // Caso especial fuentes 10, 9 y 6
+    if (hasCurrentSource(FourMeshCircuitIdentifier.branch10) && hasCurrentSource(FourMeshCircuitIdentifier.branch9) && hasCurrentSource(FourMeshCircuitIdentifier.branch6)) {
+      // Vamos por 3
+      double r3 = 0;
+      for (var resistor in branch3.resistors) {
+        r3 += resistor.resistance;
+      }
+
+      double i3 =
+          (branch6.currentSources.first.current * branch6.currentSources.first.sign) +
+          (branch9.currentSources.first.current * branch9.currentSources.first.sign) +
+          (branch10.currentSources.first.current * branch10.currentSources.first.sign);
+
+      double v3 = 0;
+      for (var voltSource in branch3.voltageSources) {
+        v3 += voltSource.voltage * voltSource.sign;
+      }
+
+      theveninResistance = r1 + r2 + r3;
+      theveninVoltage = v1 + v2 + v3 + (r3*i3);
+    } else {
+      // si 2 fuentes en 6-7 o 6-8 calculamos I3 como la suma de estas dos y resolvemos
+      if (getCurrentSources().length == 2 && hasCurrentSource(FourMeshCircuitIdentifier.branch6) && hasCurrentSource(FourMeshCircuitIdentifier.branch7)) {
+        // Vamos por 3 con I3=I6+I7
+        double i3 =
+            (branch6.currentSources.first.current * branch6.currentSources.first.sign) +
+                (branch7.currentSources.first.current * branch7.currentSources.first.sign);
+        double r3 = 0;
+        for (var resistor in branch3.resistors) {
+          r3 += resistor.resistance;
+        }
+        double v3 = 0;
+        for (var voltSource in branch3.voltageSources) {
+          v3 += voltSource.voltage * voltSource.sign;
+        }
+        theveninResistance = r1 + r2 + r3;
+        theveninVoltage = v1 + v2 + v3 + (r3*i3);
+      } else if (getCurrentSources().length == 2 && hasCurrentSource(FourMeshCircuitIdentifier.branch6) && hasCurrentSource(FourMeshCircuitIdentifier.branch8)) {
+        // Vamos por 3 con I3=I6+I8
+        double i3 =
+            (branch6.currentSources.first.current * branch6.currentSources.first.sign) +
+                (branch8.currentSources.first.current * branch8.currentSources.first.sign);
+        double r3 = 0;
+        for (var resistor in branch3.resistors) {
+          r3 += resistor.resistance;
+        }
+        double v3 = 0;
+        for (var voltSource in branch3.voltageSources) {
+          v3 += voltSource.voltage * voltSource.sign;
+        }
+        theveninResistance = r1 + r2 + r3;
+        theveninVoltage = v1 + v2 + v3 + (r3*i3);
+      } else if (getCurrentSources().length == 3 && (hasCurrentSource(FourMeshCircuitIdentifier.branch7) || hasCurrentSource(FourMeshCircuitIdentifier.branch8))) {
+        // si hay 3 fuentes y una esta en en 7 o 8, equivalente de 9 y 10 (2 mallas) + 3 mallas
+        // Equivalente 9 y 10
+        TwoMeshCircuit auxleft = TwoMeshCircuit();
+        auxleft.branch1 = CircuitBranch(); // empty
+        auxleft.branch2 = CircuitBranch(); // empty
+        auxleft.branch3 = branch9;
+        auxleft.branch4 = branch10;
+
+        TheveninEquivalent auxleftEquiv = auxleft.calculateTheveninEquivalent();
+        // Pegar al trozo restante
+        ThreeMeshCircuit aux2 = ThreeMeshCircuit();
+        aux2.branch1 = branch1;
+        aux2.branch2 = branch2;
+        aux2.branch3 = branch3;
+        aux2.branch4 = branch4;
+        aux2.branch5 = branch5;
+        aux2.branch6 = branch6;
+        aux2.branch7 = CircuitBranch();
+
+        aux2.branch7.currentSources = [
+          ...branch7.currentSources,
+          ...branch8.currentSources
+        ];
+        aux2.branch7.voltageSources = [
+          ...branch7.voltageSources,
+          ...branch8.voltageSources,
+          VoltageSource(Offset(0,0), auxleftEquiv.voltage.abs(), auxleftEquiv.voltage < 0 ? -1 : 1)
+        ];
+        aux2.branch7.resistors = [
+          ...branch7.resistors,
+          ...branch8.resistors,
+          Resistor(Offset(0,0), auxleftEquiv.resistance)
+        ];
+
+        TheveninEquivalent finalEquiv = aux2.calculateTheveninEquivalent();
+        theveninVoltage = finalEquiv.voltage;
+        theveninResistance = finalEquiv.resistance;
+      } else {
+        // Caso normal, equiv de 3 mallas + 2 ramas con el
+        // Cortar entre ramas 4 y 5
+        ThreeMeshCircuit auxLeft = ThreeMeshCircuit();
+        auxLeft.branch1 = CircuitBranch();
+        auxLeft.branch2 = CircuitBranch();
+        auxLeft.branch3 = branch6;
+        auxLeft.branch4 = branch7;
+        auxLeft.branch5 = branch8;
+        auxLeft.branch6 = branch9;
+        auxLeft.branch7 = branch10;
+
+        TheveninEquivalent auxLeftEquiv = auxLeft.calculateTheveninEquivalent();
+
+        // Pegar al cacho restante
+        TwoMeshCircuit aux2 = TwoMeshCircuit();
+        aux2.branch1 = branch1; // empty
+        aux2.branch2 = branch2; // empty
+        aux2.branch3 = branch3;
+
+        aux2.branch4 = CircuitBranch();
+        aux2.branch4.currentSources = [
+          ...branch4.currentSources,
+          ...branch5.currentSources
+        ];
+        aux2.branch4.voltageSources = [
+          ...branch4.voltageSources,
+          ...branch5.voltageSources,
+          VoltageSource(Offset(0,0), auxLeftEquiv.voltage.abs(), auxLeftEquiv.voltage < 0 ? -1 : 1)
+        ];
+        aux2.branch4.resistors = [
+          ...branch4.resistors,
+          ...branch5.resistors,
+          Resistor(Offset(0,0), auxLeftEquiv.resistance)
+        ];
+
+        TheveninEquivalent finalEquiv = aux2.calculateTheveninEquivalent();
+        theveninVoltage = finalEquiv.voltage;
+        theveninResistance = finalEquiv.resistance;
+      }
+
+    }
+    return TheveninEquivalent(theveninVoltage, theveninResistance);
   }
 }

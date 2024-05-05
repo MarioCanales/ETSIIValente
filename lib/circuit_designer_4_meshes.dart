@@ -383,30 +383,53 @@ class _CircuitDesigner4MeshesState extends State<CircuitDesigner4Meshes> {
       message =
       "No se pueden colocar más fuentes de intensidad. El máximo de fuentes de intensidad en este circuito es de 3.";
     } else if ((target == FourMeshCircuitIdentifier.branch3 ||target == FourMeshCircuitIdentifier.branch4 || target == FourMeshCircuitIdentifier.branch5)
+    // Grupo 3-5-6
         && (circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch3) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch4) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch5))
     ) {
       message =
       "No se puede colocar una fuente de intensidad aquí. Hay una fuente en una rama cercana";
-    } else if ((target == FourMeshCircuitIdentifier.branch6 ||target == FourMeshCircuitIdentifier.branch7 || target == FourMeshCircuitIdentifier.branch8)
-        && (circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch6) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch7) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch8))
+    } else if ((target == FourMeshCircuitIdentifier.branch7 || target == FourMeshCircuitIdentifier.branch8)
+        && (circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch7) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch8))
     ) {
+      // Grupo 7-8
       message =
       "No se puede colocar una fuente de intensidad aquí. Hay una fuente en una rama cercana";
-    } else if (currentSources.length == 1) {
-      // TODO: implementar condicionalidad de grupos, (3,4,5), (7,8) + anterior por la izq
-      message =
-      "";
-    } else if (currentSources.length == 1) {
-      // TODO: caso anterior por la izquierda
-      message =
-      ".";
     } else if (currentSources.length == 2) {
-      // TODO: ultimo caso, 3 ifs,
-      message =
-      ".";
+      // Se intenta meter una tercera:
+
+      bool group345 =  circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch3) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch4) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch5);
+      bool group78 = circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch7) || circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch8);
+
+      String defaultErrorMessage = "No se puede colocar una fuente de intensidad aquí. Hay una fuente en una rama cercana";
+      // Si hay en 3-4-5 y 6, no puede haber en 7 ni 8
+      if ((group345 && circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch6)) && (target==FourMeshCircuitIdentifier.branch7 || target==FourMeshCircuitIdentifier.branch8)) {
+        message = defaultErrorMessage;
+      } else if (group345 && group78 && target==FourMeshCircuitIdentifier.branch6) {
+        message = defaultErrorMessage;
+      } else if (circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch6)) {
+        // Si hay en 6 y 3-4-5 no 7 u 8, si hay en 6 y 7 u 8 no 3-4-5
+        if(group345 && (target==FourMeshCircuitIdentifier.branch7 || target==FourMeshCircuitIdentifier.branch8)) {
+          message = defaultErrorMessage;
+        } else if (group78 && (target==FourMeshCircuitIdentifier.branch3 || target==FourMeshCircuitIdentifier.branch4 || target==FourMeshCircuitIdentifier.branch5)) {
+          message = defaultErrorMessage;
+        }
+      } else if (group78) {
+        // Si hay en 7u8...
+        // Si 6 no 345
+        if(circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch6) && (target==FourMeshCircuitIdentifier.branch3 || target==FourMeshCircuitIdentifier.branch4 || target==FourMeshCircuitIdentifier.branch5)) {
+          message = defaultErrorMessage;
+        // Si 3-4-5 no 6
+        } else if (group345 && target == FourMeshCircuitIdentifier.branch6) {
+          message = defaultErrorMessage;
+        // Si 9 no 10
+        } else if (circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch9) && (target == FourMeshCircuitIdentifier.branch10)) {
+          message = defaultErrorMessage;
+        // Si 10 no 9
+        } else if (circuit.hasCurrentSource(FourMeshCircuitIdentifier.branch10) && (target == FourMeshCircuitIdentifier.branch9)) {
+          message = defaultErrorMessage;
+        }
+      }
     }
-    // Implement : 2 resistencias, ver caso anterior para la izquierda
-    // 3 -> grupos (3,4,5), (6), (7,8)
 
     if (message != null) {
       // Validation error
