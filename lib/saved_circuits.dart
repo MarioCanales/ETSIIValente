@@ -146,6 +146,6 @@ class _SavedCircuitsPageState extends State<SavedCircuitsPage> {
       _circuits = CircuitManager().loadCircuits(); // Refresh the list
     });
     ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text("Circuito eliminado: $name")));
+        .showSnackBar(SnackBar(content: Text("Circuito eliminado: $name"), duration: Duration(seconds: 1)));
   }
 }

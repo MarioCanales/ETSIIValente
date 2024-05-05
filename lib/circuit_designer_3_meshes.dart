@@ -519,6 +519,19 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("El nombre del circuito no puede estar vacío"),
         backgroundColor: Colors.red,
+          duration: Duration(seconds: 1)
+      ));
+      return;
+    }
+
+    // Check name is unique
+    List<CircuitStoreWrapper> existingCircuits = await CircuitManager().loadCircuits();
+    bool nameExists = existingCircuits.any((circuit) => circuit.name.toLowerCase() == name.toLowerCase());
+    if (nameExists) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Ya existe un circuito con el nombre '$name'. Por favor, elige otro nombre."),
+        backgroundColor: Colors.red,
+          duration: Duration(seconds: 1)
       ));
       return;
     }
@@ -530,6 +543,8 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text("Circuito '$name' guardado correctamente"),
+      backgroundColor: Colors.green,
+        duration: Duration(seconds: 1)
     ));
   }
 
@@ -705,10 +720,10 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
                   // Write the serialized JSON data to the selected file.
                   if (filePath != null) {
                     await FileUtils.writeToFile(filePath, circuit.toJson());
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Circuito guardado en $filePath')));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Circuito guardado en $filePath'), duration: Duration(seconds: 1)));
                     print('Data saved to file: $filePath');
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Guardado cancelado')));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Guardado cancelado'), duration: Duration(seconds: 1)));
                     print('No file selected.');
                   }
                 },
