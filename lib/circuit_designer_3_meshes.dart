@@ -20,8 +20,8 @@ import 'electricComponents/voltage_source.dart';
 enum SelectedComponent { resistor, voltageSource, currentSource, edit }
 
 class CircuitParameters {
-  static const double tolerance = 10.0;
-  static const double componentRange = 40.0;
+  static const double tolerance = 10.0; // Tolerancia del click
+  static const double componentRange = 40.0; // Separacion entre componentes
   static const double circuitWidth = 800.0;
   static const double circuitHeight = 300.0;
   static const double circuitPadding = 90.0;
@@ -134,12 +134,12 @@ class CircuitParameters {
   ];
 
   static Map<ThreeMeshCircuitIdentifier, List<CircuitLine>> BranchsLinesMap = {
+    ThreeMeshCircuitIdentifier.branch6: CircuitLinesBranch6,
+    ThreeMeshCircuitIdentifier.branch3: CircuitLinesBranch3,
     ThreeMeshCircuitIdentifier.branch1: CircuitLinesBranch1,
     ThreeMeshCircuitIdentifier.branch2: CircuitLinesBranch2,
-    ThreeMeshCircuitIdentifier.branch3: CircuitLinesBranch3,
     ThreeMeshCircuitIdentifier.branch4: CircuitLinesBranch4,
     ThreeMeshCircuitIdentifier.branch5: CircuitLinesBranch5,
-    ThreeMeshCircuitIdentifier.branch6: CircuitLinesBranch6,
     ThreeMeshCircuitIdentifier.branch7: CircuitLinesBranch7
   };
 
