@@ -164,8 +164,11 @@ class TwoMeshCircuit extends Circuit {
       double ir4 = branch4.currentSources.first.current*branch4.currentSources.first.sign;
       theveninVoltage += ir4*r3+v3;
     } else {
-      double i = (-v3 + v4)/(r3+r4);
-      theveninVoltage += r3*i+v3;
+      if(!(r3+r4== 0 && v3==0 && v4==0)) {
+        // No vacio
+        double i = (-v3 + v4)/(r3+r4);
+        theveninVoltage += r3*i+v3;
+      }
     }
     return TheveninEquivalent(theveninVoltage, theveninResistance);
   }
