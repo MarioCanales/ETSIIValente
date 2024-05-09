@@ -95,7 +95,7 @@ BEGIN
             VALUE "InternalName", "thevenin_norton" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "thevenin_norton.exe" "\0"
-            VALUE "ProductName", "thevenin_norton" "\0"
+            VALUE "ProductName", "ETSIIvalente" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
