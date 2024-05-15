@@ -87,7 +87,7 @@ flutter:
     - assets/background.png
     - assets/logo_etsii.png
     - assets/fuenteIntensidad.png
-    - assets/resistor.jpg
+    - assets/resistor.png
     - assets/voltajeFuente.png
     - assets/equivalent-template.png
     - assets/norton-equivalent-template.png

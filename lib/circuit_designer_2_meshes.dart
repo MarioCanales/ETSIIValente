@@ -25,8 +25,8 @@ class CircuitParameters {
   static const double circuitWidth = 800.0;
   static const double circuitHeight = 300.0;
   static const double circuitPadding = 90.0;
-  static const double imageWidth = 60.0;
-  static const double imageHeight = 30.0;
+  static const double imageWidth = 50.0;
+  static const double imageHeight = 50.0;
 
   // Structuring branch numbers according to Alfonso doc
   // (available on TFG documentation)
@@ -144,7 +144,7 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
     voltageSources = circuit.getVoltageSources();
     currentSources = circuit.getCurrentSources();
     _loadImage(
-        'assets/resistor.jpg', (img) => setState(() => resistorImage = img));
+        'assets/resistor.png', (img) => setState(() => resistorImage = img));
     _loadImage('assets/voltajeFuente.png',
         (img) => setState(() => voltageSourceImage = img));
     _loadImage('assets/fuenteIntensidad.png',
@@ -524,7 +524,7 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
                     opacity: selectedComponent == SelectedComponent.resistor
                         ? 1.0
                         : 0.5,
-                    child: Image.asset('assets/resistor.jpg', width: 50),
+                    child: Image.asset('assets/resistor.png', width: 50),
                   ),
                 ),
               ),
@@ -782,30 +782,28 @@ class CircuitPainter extends CustomPainter {
     bool isBottom = position.dy ==
         CircuitParameters.circuitPadding + CircuitParameters.circuitHeight;
 
+    double componentWidth = CircuitParameters.imageWidth;
+    double componentHeight = CircuitParameters.imageHeight;
+
     Rect destRect = Rect.fromCenter(
       center: position,
-      width: isVerticalLine
-          ? CircuitParameters.imageHeight
-          : CircuitParameters.imageWidth, // Swap dimensions if vertical
-      height: isVerticalLine
-          ? CircuitParameters.imageWidth
-          : CircuitParameters.imageHeight,
+      width: componentWidth,
+      height: componentHeight,
     );
+
+    // Save canvas state before rotation
     canvas.save();
 
-    // Rotation calculation
+    // Apply rotation if necessary
     double rotationAngle = 0;
     if (isVerticalLine) {
-      rotationAngle = sign * (-pi) / 2;
+      rotationAngle = -pi / 2;
     } else if (isBottom) {
-      // For keeping orientation consistency
-      rotationAngle = sign == 1
-          ? pi
-          : 0;
+      rotationAngle = pi;
     } else if (sign == -1) {
-      // reverse horizontal in top line
       rotationAngle = pi;
     }
+
     if (rotationAngle != 0) {
       canvas.translate(position.dx, position.dy);
       canvas.rotate(rotationAngle);
@@ -819,12 +817,11 @@ class CircuitPainter extends CustomPainter {
       destRect,
       Paint(),
     );
-    // Restore the canvas to the previous state
-    // Draw the value text above the component
-    // Create a text painter to draw the value
+
+    // Restore the canvas state after drawing the image
     canvas.restore();
 
-    // If vertical rotate -pi/2 FIXED regardless of sign
+    // Draw the value text above the component
     canvas.save();
     if (isVerticalLine) {
       canvas.translate(position.dx, position.dy);
@@ -833,30 +830,25 @@ class CircuitPainter extends CustomPainter {
     }
 
     String valueText = "";
-    if(selectedComponent == SelectedComponent.resistor) {
-      valueText = "${(value/1000).toStringAsFixed(1)} KΩ";
+    if (selectedComponent == SelectedComponent.resistor) {
+      valueText = "${(value / 1000).toStringAsFixed(1)} KΩ";
     } else if (selectedComponent == SelectedComponent.voltageSource) {
       valueText = "${(value).toStringAsFixed(1)} V";
     } else {
-      valueText = "${(value*1000).toStringAsFixed(1)} mA";
+      valueText = "${(value * 1000).toStringAsFixed(1)} mA";
     }
+
     TextSpan span = TextSpan(
-        style: const TextStyle(color: Colors.black),
-        text: valueText
-    );
+        style: const TextStyle(color: Colors.black), text: valueText);
     TextPainter tp = TextPainter(
-        text: span,
-        textAlign: TextAlign.center,
-        textDirection: TextDirection.ltr);
+        text: span, textAlign: TextAlign.center, textDirection: TextDirection.ltr);
     tp.layout();
-    // Calculate the offset to center the text above the component
-    // Subtract half the text width from the component's center position
+
     double textX = position.dx - (tp.width / 2);
-    // Adjust the y position to move the text above the component, modifying the offset as needed
     double textY = position.dy -
         CircuitParameters.imageHeight -
-        tp.height; // You may need to adjust this based on your component size
-    // Paint the text
+        tp.height + 20;
+
     tp.paint(canvas, Offset(textX, textY));
 
     canvas.restore();
