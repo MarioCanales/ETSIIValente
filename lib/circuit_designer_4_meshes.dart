@@ -714,6 +714,8 @@ class _CircuitDesigner4MeshesState extends State<CircuitDesigner4Meshes> {
                 onTap: () =>
                     setState(() => selectedComponent = SelectedComponent.edit),
                 child: Container(
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     border: Border.all(
                       color: selectedComponent == SelectedComponent.edit
@@ -725,7 +727,7 @@ class _CircuitDesigner4MeshesState extends State<CircuitDesigner4Meshes> {
                   child: Opacity(
                     opacity:
                     selectedComponent == SelectedComponent.edit ? 1.0 : 0.5,
-                    child: const Icon(Icons.edit, size: 24),
+                    child: const Icon(Icons.edit, size: 25),
                   ),
                 ),
               ),
