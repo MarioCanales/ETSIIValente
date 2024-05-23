@@ -12,7 +12,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
-import 'circuitComponents/CircuitMesh.dart';
+import 'circuitComponents/CircuitBranch.dart';
 import 'circuits/CircuitManager.dart';
 import 'electricComponents/resistor.dart';
 import 'electricComponents/voltage_source.dart';
@@ -575,7 +575,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
                     opacity: selectedComponent == SelectedComponent.resistor
                         ? 1.0
                         : 0.5,
-                    child: Image.asset('assets/resistor.png', width: 50),
+                    child: Tooltip(message: "Resistencia", child: Image.asset('assets/resistor.png', width: 50)),
                   ),
                 ),
               ),
@@ -597,7 +597,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
                     selectedComponent == SelectedComponent.voltageSource
                         ? 1.0
                         : 0.5,
-                    child: Image.asset('assets/voltajeFuente.png', width: 50),
+                    child: Tooltip(message: "Fuente de Voltaje", child: Image.asset('assets/voltajeFuente.png', width: 50)),
                   ),
                 ),
               ),
@@ -619,8 +619,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
                     selectedComponent == SelectedComponent.currentSource
                         ? 1.0
                         : 0.5,
-                    child:
-                    Image.asset('assets/fuenteIntensidad.png', width: 50),
+                    child: Tooltip(message: "Fuente de Intensidad", child: Image.asset('assets/fuenteIntensidad.png', width: 50)),
                   ),
                 ),
               ),
@@ -641,7 +640,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
                   child: Opacity(
                     opacity:
                     selectedComponent == SelectedComponent.edit ? 1.0 : 0.5,
-                    child: const Icon(Icons.edit, size: 25),
+                    child: Tooltip(message: "Editar", child: const Icon(Icons.edit, size: 25)),
                   ),
                 ),
               ),

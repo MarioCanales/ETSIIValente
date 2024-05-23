@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import '../circuitComponents/CircuitMesh.dart';
+import '../circuitComponents/CircuitBranch.dart';
 import '../circuitComponents/TheveninEquivalent.dart';
 import '../electricComponents/current_source.dart';
 import '../electricComponents/resistor.dart';

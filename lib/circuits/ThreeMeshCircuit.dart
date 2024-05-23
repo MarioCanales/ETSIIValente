@@ -5,7 +5,7 @@ import 'dart:ui';
 import 'package:ETSIIValente/electricComponents/current_source.dart';
 import 'package:ETSIIValente/electricComponents/voltage_source.dart';
 
-import '../circuitComponents/CircuitMesh.dart';
+import '../circuitComponents/CircuitBranch.dart';
 import '../circuitComponents/TheveninEquivalent.dart';
 import '../electricComponents/resistor.dart';
 import 'Circuit.dart';

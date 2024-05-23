@@ -11,7 +11,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
-import 'circuitComponents/CircuitMesh.dart';
+import 'circuitComponents/CircuitBranch.dart';
 import 'circuits/CircuitManager.dart';
 import 'circuits/TwoMeshCircuit.dart';
 import 'electricComponents/resistor.dart';
@@ -113,8 +113,7 @@ class CircuitParameters {
 class CircuitDesigner2Meshes extends StatefulWidget {
   TwoMeshCircuit circuit;
 
-  CircuitDesigner2Meshes({Key? key, required this.circuit})
-      : super(key: key);
+  CircuitDesigner2Meshes({Key? key, required this.circuit}) : super(key: key);
 
   @override
   _CircuitDesigner2MeshesState createState() =>
@@ -232,16 +231,12 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
         branch.resistors.add(component); // new values
       } else if (component is CurrentSource) {
         // If value < 0 change sign
-        int sign = newValue > 0
-            ? component.sign
-            : (-1 * component.sign);
+        int sign = newValue > 0 ? component.sign : (-1 * component.sign);
         component.current = newValue.abs();
         component.sign = sign;
         branch.currentSources.add(component);
       } else if (component is VoltageSource) {
-        int sign = newValue > 0
-            ? component.sign
-            : (-1 * component.sign);
+        int sign = newValue > 0 ? component.sign : (-1 * component.sign);
         component.voltage = newValue.abs();
         component.sign = sign;
         branch.voltageSources.add(component);
@@ -318,7 +313,8 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
     return true;
   }
 
-  void _addComponentAtPosition(TapDownDetails details, CircuitBranch branch) async {
+  void _addComponentAtPosition(
+      TapDownDetails details, CircuitBranch branch) async {
     Offset adjustedPosition = _adjustComponentPosition(details.localPosition);
     TextEditingController valueController = TextEditingController();
 
@@ -328,7 +324,7 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
       unitOptions = ["V", "mV"];
       selectedUnit = "V";
     } else if (selectedComponent == SelectedComponent.currentSource) {
-      unitOptions = ["mA","A"];
+      unitOptions = ["mA", "A"];
       selectedUnit = "mA";
     }
 
@@ -399,7 +395,7 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
           );
         });
 
-    if(add){
+    if (add) {
       double value = double.tryParse(valueController.text) ??
           0.0; // Default to 0 if parse fails
       value = CircuitUtils.convertValue(value, selectedUnit);
@@ -409,17 +405,17 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
           branch.resistors.add(Resistor(adjustedPosition, value));
           resistors.add(Resistor(adjustedPosition, value));
         } else if (selectedComponent == SelectedComponent.voltageSource) {
-          int sign = value < 0
-              ? -1
-              : 1;
-          branch.voltageSources.add(VoltageSource(adjustedPosition, value.abs(), sign));
-          voltageSources.add(VoltageSource(adjustedPosition, value.abs(), sign));
+          int sign = value < 0 ? -1 : 1;
+          branch.voltageSources
+              .add(VoltageSource(adjustedPosition, value.abs(), sign));
+          voltageSources
+              .add(VoltageSource(adjustedPosition, value.abs(), sign));
         } else {
-          int sign = value < 0
-              ? -1
-              : 1;
-          branch.currentSources.add(CurrentSource(adjustedPosition, value.abs(), sign));
-          currentSources.add(CurrentSource(adjustedPosition, value.abs(), sign));
+          int sign = value < 0 ? -1 : 1;
+          branch.currentSources
+              .add(CurrentSource(adjustedPosition, value.abs(), sign));
+          currentSources
+              .add(CurrentSource(adjustedPosition, value.abs(), sign));
         }
       });
     }
@@ -466,43 +462,42 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
   void _saveCircuit(String name) async {
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("El nombre del circuito no puede estar vacío"),
-        backgroundColor: Colors.red,
-          duration: Duration(seconds: 1)
-      ));
+          content: Text("El nombre del circuito no puede estar vacío"),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 1)));
       return;
     }
 
     // Check name is unique
-    List<CircuitStoreWrapper> existingCircuits = await CircuitManager().loadCircuits();
-    bool nameExists = existingCircuits.any((circuit) => circuit.name.toLowerCase() == name.toLowerCase());
+    List<CircuitStoreWrapper> existingCircuits =
+        await CircuitManager().loadCircuits();
+    bool nameExists = existingCircuits
+        .any((circuit) => circuit.name.toLowerCase() == name.toLowerCase());
     if (nameExists) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("Ya existe un circuito con el nombre '$name'. Por favor, elige otro nombre."),
-        backgroundColor: Colors.red,
-          duration: Duration(seconds: 1)
-      ));
+          content: Text(
+              "Ya existe un circuito con el nombre '$name'. Por favor, elige otro nombre."),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 1)));
       return;
     }
 
-    CircuitStoreWrapper circuitWrapper = CircuitStoreWrapper(name: name, circuit: circuit);
+    CircuitStoreWrapper circuitWrapper =
+        CircuitStoreWrapper(name: name, circuit: circuit);
     print("Guardando....");
     await CircuitManager().addCircuit(circuitWrapper);
     print("GUARDADO!");
 
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text("Circuito '$name' guardado correctamente"),
-      backgroundColor: Colors.green,
-        duration: Duration(seconds: 1)
-    ));
+        content: Text("Circuito '$name' guardado correctamente"),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 1)));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Diseña tu circuito')
-      ),
+      appBar: AppBar(title: const Text('Diseña tu circuito')),
       body: Column(
         children: <Widget>[
           Row(
@@ -524,7 +519,7 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
                     opacity: selectedComponent == SelectedComponent.resistor
                         ? 1.0
                         : 0.5,
-                    child: Image.asset('assets/resistor.png', width: 50),
+                    child: Tooltip(message: "Resistencia", child: Image.asset('assets/resistor.png', width: 50)),
                   ),
                 ),
               ),
@@ -546,7 +541,7 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
                         selectedComponent == SelectedComponent.voltageSource
                             ? 1.0
                             : 0.5,
-                    child: Image.asset('assets/voltajeFuente.png', width: 50),
+                    child: Tooltip(message: "Fuente de Voltaje", child: Image.asset('assets/voltajeFuente.png', width: 50)),
                   ),
                 ),
               ),
@@ -564,12 +559,11 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
                     ),
                   ),
                   child: Opacity(
-                    opacity:
-                        selectedComponent == SelectedComponent.currentSource
-                            ? 1.0
-                            : 0.5,
-                    child:
-                        Image.asset('assets/fuenteIntensidad.png', width: 50),
+                      opacity:
+                          selectedComponent == SelectedComponent.currentSource
+                              ? 1.0
+                              : 0.5,
+                      child: Tooltip(message: "Fuente de Intensidad", child: Image.asset('assets/fuenteIntensidad.png', width: 50)),
                   ),
                 ),
               ),
@@ -590,7 +584,7 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
                   child: Opacity(
                     opacity:
                         selectedComponent == SelectedComponent.edit ? 1.0 : 0.5,
-                    child: const Icon(Icons.edit, size: 25),
+                    child: Tooltip(message: "Editar", child: const Icon(Icons.edit, size: 25)),
                   ),
                 ),
               ),
@@ -671,10 +665,14 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
                   // Write the serialized JSON data to the selected file.
                   if (filePath != null) {
                     await FileUtils.writeToFile(filePath, circuit.toJson());
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Circuito guardado en $filePath'), duration: Duration(seconds: 1)));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Circuito guardado en $filePath'),
+                        duration: Duration(seconds: 1)));
                     print('Data saved to file: $filePath');
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Guardado cancelado'), duration: Duration(seconds: 1)));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Guardado cancelado'),
+                        duration: Duration(seconds: 1)));
                     print('No file selected.');
                   }
                 },
@@ -753,8 +751,10 @@ class CircuitPainter extends CustomPainter {
       textDirection: TextDirection.ltr,
     );
     tpA.layout();
-    double textXA = CircuitParameters.circuitPadding + CircuitParameters.circuitWidth + 10;
-    double textYA = CircuitParameters.circuitPadding - tpA.height / 2; // middle of the letter
+    double textXA =
+        CircuitParameters.circuitPadding + CircuitParameters.circuitWidth + 10;
+    double textYA = CircuitParameters.circuitPadding -
+        tpA.height / 2; // middle of the letter
     tpA.paint(canvas, Offset(textXA, textYA));
 
     // Draw the letter 'B' next to CircuitLine2
@@ -768,8 +768,11 @@ class CircuitPainter extends CustomPainter {
       textDirection: TextDirection.ltr,
     );
     tpB.layout();
-    double textXB = CircuitParameters.circuitPadding + CircuitParameters.circuitWidth + 10;
-    double textYB = CircuitParameters.circuitPadding + CircuitParameters.circuitHeight - tpB.height / 2; // middle of the letter
+    double textXB =
+        CircuitParameters.circuitPadding + CircuitParameters.circuitWidth + 10;
+    double textYB = CircuitParameters.circuitPadding +
+        CircuitParameters.circuitHeight -
+        tpB.height / 2; // middle of the letter
     tpB.paint(canvas, Offset(textXB, textYB));
   }
 
@@ -840,16 +843,16 @@ class CircuitPainter extends CustomPainter {
       valueText = "${(value * 1000).toStringAsFixed(1)} mA";
     }
 
-    TextSpan span = TextSpan(
-        style: const TextStyle(color: Colors.black), text: valueText);
+    TextSpan span =
+        TextSpan(style: const TextStyle(color: Colors.black), text: valueText);
     TextPainter tp = TextPainter(
-        text: span, textAlign: TextAlign.center, textDirection: TextDirection.ltr);
+        text: span,
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr);
     tp.layout();
 
     double textX = position.dx - (tp.width / 2);
-    double textY = position.dy -
-        CircuitParameters.imageHeight -
-        tp.height + 20;
+    double textY = position.dy - CircuitParameters.imageHeight - tp.height + 20;
 
     tp.paint(canvas, Offset(textX, textY));
 

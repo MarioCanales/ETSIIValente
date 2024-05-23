@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:ETSIIValente/circuits/ThreeMeshCircuit.dart';
 
-import '../circuitComponents/CircuitMesh.dart';
+import '../circuitComponents/CircuitBranch.dart';
 import '../circuitComponents/TheveninEquivalent.dart';
 import '../electricComponents/current_source.dart';
 import '../electricComponents/resistor.dart';
