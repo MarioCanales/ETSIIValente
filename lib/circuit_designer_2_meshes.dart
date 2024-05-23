@@ -802,7 +802,7 @@ class CircuitPainter extends CustomPainter {
     // Apply rotation if necessary
     double rotationAngle = 0;
     if (isVerticalLine) {
-      rotationAngle = -pi / 2;
+      rotationAngle = sign * (-pi) / 2;
     } else if (isBottom) {
       rotationAngle = pi;
     } else if (sign == -1) {
