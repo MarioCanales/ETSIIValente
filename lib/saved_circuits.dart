@@ -67,7 +67,7 @@ class _SavedCircuitsPageState extends State<SavedCircuitsPage> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.remove_red_eye, color: Colors.blue),
+                                  icon: Tooltip(child: Icon(Icons.remove_red_eye, color: Colors.blue), message: "Ver circuito",),
                                   onPressed: () {
                                     Circuit circuit = item.circuit;
                                     // You can add your edit functionality here
@@ -110,7 +110,7 @@ class _SavedCircuitsPageState extends State<SavedCircuitsPage> {
                                   },
                                 ),
                                 IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  icon: Tooltip(child: Icon(Icons.delete, color: Colors.red), message: "Eliminar circuito"),
                                   onPressed: () => _deleteCircuit(item.name),
                                 ),
                               ],
