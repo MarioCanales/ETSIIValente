@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ETSIIValente/circuits/CircuitManager.dart';
+import 'package:flutter_color/flutter_color.dart';
 
 import 'circuit_designer_2_meshes.dart';
 import 'circuit_designer_3_meshes.dart';
@@ -27,87 +28,105 @@ class _SavedCircuitsPageState extends State<SavedCircuitsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Circuitos Guardados"),
-        backgroundColor: Colors.brown,
+        toolbarHeight: 88,
+        title: Text(
+          "Circuitos Guardados",
+          style: TextStyle(
+            color: Colors.brown.darker(30),
+            fontSize: 27, // Tamaño de fuente aumentado
+            fontWeight: FontWeight.bold, // Peso de la fuente más grueso
+          ),
+        ),
+        backgroundColor: Colors.white,
       ),
-      body: FutureBuilder<List<CircuitStoreWrapper>>(
-        future: _circuits,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return Center(child: Text("Error: ${snapshot.error}"));
-            } else if (snapshot.hasData) {
-              return Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    final item = snapshot.data![index];
-                    return Card(
-                      elevation: 5,
-                      child: ListTile(
-                        title: Text(item.name, style: TextStyle(fontSize: 18)),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.remove_red_eye, color: Colors.blue),
-                              onPressed: () {
-                                Circuit circuit = item.circuit;
-                                // You can add your edit functionality here
-                                if (circuit is TwoMeshCircuit) {
-                                  Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CircuitDesigner2Meshes(
-                                                      circuit: circuit)))
-                                      .then((value) => setState(() {
-                                            _circuits =
-                                                CircuitManager().loadCircuits();
-                                          }));
-                                } else if (circuit is ThreeMeshCircuit) {
-                                  Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CircuitDesigner3Meshes(
-                                                      circuit: circuit)))
-                                      .then((value) => setState(() {
-                                            _circuits =
-                                                CircuitManager().loadCircuits();
-                                          }));
-                                  ;
-                                } else if (circuit is FourMeshCircuit) {
-                                  Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CircuitDesigner4Meshes(
-                                                      circuit: circuit)))
-                                      .then((value) => setState(() {
-                                            _circuits =
-                                                CircuitManager().loadCircuits();
-                                          }));
-                                  ;
-                                }
-                              },
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/background.png'),
+                    fit: BoxFit.cover)),
+            child: FutureBuilder<List<CircuitStoreWrapper>>(
+            future: _circuits,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error: ${snapshot.error}"));
+                } else if (snapshot.hasData) {
+                  return Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final item = snapshot.data![index];
+                        return Card(
+                          elevation: 5,
+                          child: ListTile(
+                            title: Text(item.name, style: TextStyle(fontSize: 18)),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.remove_red_eye, color: Colors.blue),
+                                  onPressed: () {
+                                    Circuit circuit = item.circuit;
+                                    // You can add your edit functionality here
+                                    if (circuit is TwoMeshCircuit) {
+                                      Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CircuitDesigner2Meshes(
+                                                          circuit: circuit)))
+                                          .then((value) => setState(() {
+                                                _circuits =
+                                                    CircuitManager().loadCircuits();
+                                              }));
+                                    } else if (circuit is ThreeMeshCircuit) {
+                                      Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CircuitDesigner3Meshes(
+                                                          circuit: circuit)))
+                                          .then((value) => setState(() {
+                                                _circuits =
+                                                    CircuitManager().loadCircuits();
+                                              }));
+                                      ;
+                                    } else if (circuit is FourMeshCircuit) {
+                                      Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      CircuitDesigner4Meshes(
+                                                          circuit: circuit)))
+                                          .then((value) => setState(() {
+                                                _circuits =
+                                                    CircuitManager().loadCircuits();
+                                              }));
+                                      ;
+                                    }
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () => _deleteCircuit(item.name),
+                                ),
+                              ],
                             ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteCircuit(item.name),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            }
-          }
-          return Center(child: CircularProgressIndicator());
-        },
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+              }
+              return Center(child: CircularProgressIndicator());
+            },
+                    ),
+          ),
+      ]
       ),
     );
   }

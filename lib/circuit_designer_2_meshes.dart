@@ -11,6 +11,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
+import 'package:flutter_color/flutter_color.dart';
 import 'circuitComponents/CircuitBranch.dart';
 import 'circuits/CircuitManager.dart';
 import 'circuits/TwoMeshCircuit.dart';
@@ -497,98 +498,122 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Diseña tu circuito')),
+      appBar: AppBar(
+        title: Text(
+          "Diseña tu circuito",
+          style: TextStyle(
+            color: Colors.brown.darker(30),
+            fontSize: 25, // Tamaño de fuente aumentado
+            fontWeight: FontWeight.bold, // Peso de la fuente más grueso
+          ),
+        ),
+      ),
       body: Column(
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              GestureDetector(
-                onTap: () => setState(
-                    () => selectedComponent = SelectedComponent.resistor),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: selectedComponent == SelectedComponent.resistor
-                          ? Colors.blue
-                          : Colors.transparent,
-                      width: 2,
+          Container(
+            margin: EdgeInsets.fromLTRB(90,10,90,10),
+            padding: EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10), // Bordes redondeados
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black,
+                  blurRadius: 4,
+                  offset: Offset(0, 2), // Sombra hacia abajo
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                GestureDetector(
+                  onTap: () => setState(
+                      () => selectedComponent = SelectedComponent.resistor),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: selectedComponent == SelectedComponent.resistor
+                            ? Colors.blue
+                            : Colors.transparent,
+                        width: 2,
+                      ),
                     ),
-                  ),
-                  child: Opacity(
-                    opacity: selectedComponent == SelectedComponent.resistor
-                        ? 1.0
-                        : 0.5,
-                    child: Tooltip(message: "Resistencia", child: Image.asset('assets/resistor.png', width: 50)),
+                    child: Opacity(
+                      opacity: selectedComponent == SelectedComponent.resistor
+                          ? 1.0
+                          : 0.5,
+                      child: Tooltip(message: "Resistencia", child: Image.asset('assets/resistor.png', width: 50)),
+                    ),
                   ),
                 ),
-              ),
-              GestureDetector(
-                onTap: () => setState(
-                    () => selectedComponent = SelectedComponent.voltageSource),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color:
-                          selectedComponent == SelectedComponent.voltageSource
-                              ? Colors.blue
-                              : Colors.transparent,
-                      width: 2,
+                GestureDetector(
+                  onTap: () => setState(
+                      () => selectedComponent = SelectedComponent.voltageSource),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color:
+                            selectedComponent == SelectedComponent.voltageSource
+                                ? Colors.blue
+                                : Colors.transparent,
+                        width: 2,
+                      ),
                     ),
-                  ),
-                  child: Opacity(
-                    opacity:
-                        selectedComponent == SelectedComponent.voltageSource
-                            ? 1.0
-                            : 0.5,
-                    child: Tooltip(message: "Fuente de Voltaje", child: Image.asset('assets/voltajeFuente.png', width: 50)),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () => setState(
-                    () => selectedComponent = SelectedComponent.currentSource),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color:
-                          selectedComponent == SelectedComponent.currentSource
-                              ? Colors.blue
-                              : Colors.transparent,
-                      width: 2,
-                    ),
-                  ),
-                  child: Opacity(
+                    child: Opacity(
                       opacity:
-                          selectedComponent == SelectedComponent.currentSource
+                          selectedComponent == SelectedComponent.voltageSource
                               ? 1.0
                               : 0.5,
-                      child: Tooltip(message: "Fuente de Intensidad", child: Image.asset('assets/fuenteIntensidad.png', width: 50)),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () =>
-                    setState(() => selectedComponent = SelectedComponent.edit),
-                child: Container(
-                  width: 50,
-                  height: 50,
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: selectedComponent == SelectedComponent.edit
-                          ? Colors.blue
-                          : Colors.transparent,
-                      width: 2,
+                      child: Tooltip(message: "Fuente de Voltaje", child: Image.asset('assets/voltajeFuente.png', width: 50)),
                     ),
                   ),
-                  child: Opacity(
-                    opacity:
-                        selectedComponent == SelectedComponent.edit ? 1.0 : 0.5,
-                    child: Tooltip(message: "Editar", child: const Icon(Icons.edit, size: 25)),
+                ),
+                GestureDetector(
+                  onTap: () => setState(
+                      () => selectedComponent = SelectedComponent.currentSource),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color:
+                            selectedComponent == SelectedComponent.currentSource
+                                ? Colors.blue
+                                : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Opacity(
+                        opacity:
+                            selectedComponent == SelectedComponent.currentSource
+                                ? 1.0
+                                : 0.5,
+                        child: Tooltip(message: "Fuente de Intensidad", child: Image.asset('assets/fuenteIntensidad.png', width: 50)),
+                    ),
                   ),
                 ),
-              ),
-            ],
+                GestureDetector(
+                  onTap: () =>
+                      setState(() => selectedComponent = SelectedComponent.edit),
+                  child: Container(
+                    width: 50,
+                    height: 50,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: selectedComponent == SelectedComponent.edit
+                            ? Colors.blue
+                            : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Opacity(
+                      opacity:
+                          selectedComponent == SelectedComponent.edit ? 1.0 : 0.5,
+                      child: Tooltip(message: "Editar", child: const Icon(Icons.edit, size: 25)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           Expanded(
             child: GestureDetector(
@@ -649,41 +674,64 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              TheveninWindow(circuit: circuit)));
-                },
-                child: const Text('Calcular equivalente',
-                    style: TextStyle(color: Colors.brown))),
-            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white, backgroundColor: Colors.brown.darker(18),
+                  elevation: 10,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+                ),
                 onPressed: () async {
                   // Use file picker to get the file path where the data will be saved.
                   String? filePath = await FileUtils.selectSaveFile();
                   // Write the serialized JSON data to the selected file.
                   if (filePath != null) {
                     await FileUtils.writeToFile(filePath, circuit.toJson());
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Circuito guardado en $filePath'),
-                        duration: Duration(seconds: 1)));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Circuito guardado en $filePath'), duration: Duration(seconds: 1)));
                     print('Data saved to file: $filePath');
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text('Guardado cancelado'),
-                        duration: Duration(seconds: 1)));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Guardado cancelado'), duration: Duration(seconds: 1)));
                     print('No file selected.');
                   }
                 },
                 child: const Text('Exportar',
-                    style: TextStyle(color: Colors.brown))),
+                    style: TextStyle(color: Colors.white))
+            ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.brown.darker(18),
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+              ),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            TheveninWindow(circuit: circuit)));
+              },
+              child: const Text('Calcular equivalente',
+                  style: TextStyle(color: Colors.white)
+              ),
+            ),
+            ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white, backgroundColor: Colors.brown.darker(18),
+                  elevation: 10,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+                ),
                 onPressed: () {
                   _saveCircuitDialog();
                 },
                 child: const Text('Guardar',
-                    style: TextStyle(color: Colors.brown))),
+                    style: TextStyle(color: Colors.white))),
           ],
         ),
       ),

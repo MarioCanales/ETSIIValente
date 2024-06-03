@@ -1,5 +1,6 @@
 import 'package:ETSIIValente/circuitComponents/TheveninEquivalent.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_color/flutter_color.dart';
 import 'dart:math';
 
 import 'circuits/Circuit.dart';
@@ -28,7 +29,14 @@ class _TheveninWindowState extends State<TheveninWindow> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(showThevenin ? "Equivalente Thevenin" : "Equivalente Norton"),
+        title: Text(
+          showThevenin ? "Equivalente Thevenin" : "Equivalente Norton",
+          style: TextStyle(
+            color: Colors.brown.darker(30),
+            fontSize: 25, // Tamaño de fuente aumentado
+            fontWeight: FontWeight.bold, // Peso de la fuente más grueso
+          ),
+        ),
       ),
       body: Center(
         child: Column(
@@ -51,6 +59,14 @@ class _TheveninWindowState extends State<TheveninWindow> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.brown.darker(18),
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+              ),
               onPressed: () {
                 setState(() {
                   showThevenin = !showThevenin;

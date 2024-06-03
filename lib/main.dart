@@ -3,6 +3,7 @@ import 'package:ETSIIValente/circuits/TwoMeshCircuit.dart';
 import 'package:ETSIIValente/saved_circuits.dart';
 import 'package:ETSIIValente/utils/fileUtils.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_color/flutter_color.dart';
 
 import 'circuit_designer_2_meshes.dart';
 import 'circuit_designer_3_meshes.dart';
@@ -27,7 +28,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ETSIIValente',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.grey).copyWith(background: Colors.white),
       ),
       home: HomeScreen(),
     );
@@ -38,100 +40,137 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          title: Row(
-            children: [
-              Image.asset('assets/logo_etsii.png',
-                  fit: BoxFit.cover, height: 60),
-              Expanded(
-                  child: Center(
-                    child: Text(
-                        'ETSIIValente', style: TextStyle(color: Colors.brown, fontSize: 30)
-                    ),
-                  )
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SavedCircuitsPage()),
-                  );
-                },
-                style:ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Image.asset('assets/logo_etsii.png', fit: BoxFit.cover, height: 60),
+            Expanded(
+              child: Center(
+                child: Text(
+                  'ETSIIValente',
+                  style: TextStyle(
+                    color: Colors.brown.darker(30),
+                    fontSize: 36,
+                    fontWeight: FontWeight.bold, 
+                    letterSpacing: 1.1, // Espaciado entre letras aumentado
+                    shadows: [ // Sombra para mejorar la legibilidad
+                      Shadow(
+                        offset: Offset(0.25, 0.25),
+                        blurRadius: 0.25,
+                        color: Colors.brown,
+                      ),
+                    ],
                   ),
-                  backgroundColor: Colors.white70
-                ) ,
-                child: Text('Circuitos guardados',
-                    style: TextStyle(color: Colors.brown))
+                ),
               ),
-            ],
-          ),
-          toolbarHeight: 90
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SavedCircuitsPage()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                foregroundColor: Colors.white, backgroundColor: Colors.brown.darker(10),
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              ),
+              child: Text('Circuitos guardados', style: TextStyle(color: Colors.white)),
+            ),
+          ],
         ),
-        body: Container(
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/background.png'),
-                  fit: BoxFit.cover)),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  'Calcula el circuito equivalente Thevenin',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 44,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Elige la estructura, diseña, resuelve.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey),
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.brown),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.zero, // No rounded
-                      )
+        toolbarHeight: 90,
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage('assets/background.png'),
+                    fit: BoxFit.cover)),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      'Calcula el circuito equivalente Thevenin',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 36, // Tamaño de fuente grande
+                        fontWeight: FontWeight.bold,
+                        color: Colors.brown.darker(30)
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Elige la estructura, diseña, resuelve.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.brown.darker(20)),
+                    ),
+                    SizedBox(height: 30),
+                    SizedBox(
+                      width: 190,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white, backgroundColor: Colors.brown.darker(18),
+                          elevation: 10,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+                        ),
+                        child: Text('Diseñar', style: TextStyle(color: Colors.white, fontSize: 18)),
+                        onPressed: () {
+                          _showMeshSelectionDialog(context);
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    SizedBox(
+                        width: 190,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white, backgroundColor: Colors.brown.darker(18),
+                            elevation: 10,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 40),
+                          ),
+                          child: Text('Importar', style: TextStyle(color: Colors.white, fontSize: 18)),
+                          onPressed: () {
+                            _handleImport(context);
+                          },
+                        )
                     )
-                  ),
-                  child: Text('Diseñar ', style: TextStyle(color: Colors.white)),
-                  onPressed: () {
-                    _showMeshSelectionDialog(context);
-                  },
+                  ],
                 ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor:
-                      MaterialStateProperty.all<Color>(Colors.brown),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.zero// No rounded
-                          )
-                      )
-                  ),
-                  child: Text('Importar', style: TextStyle(color: Colors.white)),
-                  onPressed: () {
-                    _handleImport(context);
-                  },
-                )
-              ],
+              ),
             ),
           ),
-        ));
+          Positioned(
+            right: 10,
+            bottom: 10,
+            child: IconButton(
+              icon: Icon(Icons.info_outline, color: Colors.brown,size: 28),
+              onPressed: () {
+                _showInfoDialog(context);
+              },
+            ),
+          ),
+        ],
+      )
+
+    );
   }
 
   void _showMeshSelectionDialog(BuildContext context) {
@@ -139,26 +178,31 @@ class HomeScreen extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Selecciona el número de mallas'),
-          content: SingleChildScrollView(
-            child: ListBody(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0), // Bordes redondeados
+          ),
+          title: Text('Selecciona el número de mallas', textAlign: TextAlign.center),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView(
+              shrinkWrap: true,
               children: <Widget>[
-                GestureDetector(
-                  child: Text('2 Mallas'),
+                ListTile(
+                  title: Text('2 Mallas', textAlign: TextAlign.center),
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner2Meshes(circuit: TwoMeshCircuit())));
                   },
                 ),
-                GestureDetector(
-                  child: Text('3 Mallas'),
+                ListTile(
+                  title: Text('3 Mallas', textAlign: TextAlign.center),
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner3Meshes(circuit: ThreeMeshCircuit())));
                   },
                 ),
-                GestureDetector(
-                  child: Text('4 Mallas'),
+                ListTile(
+                  title: Text('4 Mallas', textAlign: TextAlign.center),
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.push(context, MaterialPageRoute(builder: (context) => CircuitDesigner4Meshes(circuit: FourMeshCircuit())));
@@ -172,6 +216,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+
   Future<void> _handleImport(BuildContext context) async {
     // Use file picker to get the file path where the data is be saved.
     String? filePath = await FileUtils.selectFile();
@@ -179,7 +224,7 @@ class HomeScreen extends StatelessWidget {
     if (filePath != null) {
       try {
         String? data = await FileUtils.readFromFile(filePath);
-        if(data == null) {
+        if (data == null) {
           throw Exception("Error leyendo el fichero");
         }
         Circuit circuit = Circuit.fromJson(data);
@@ -214,5 +259,31 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
+  void _showInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Icon(Icons.info, size: 40, color: Colors.brown),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('ETSIIValente-v1.0', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                SizedBox(height: 10),
+                Text('Desarrollado por Mario Canales Torres', style: TextStyle(fontSize: 16), textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cerrar', style: TextStyle(fontSize: 16)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
-
