@@ -70,9 +70,17 @@ class VoltageSource extends ElectricComponent {
               TextButton(
                 child: Text('Actualizar'),
                 onPressed: () {
-                  double value = double.tryParse(controller.text) ?? voltage; // Parse the entered value
-                  value = convertValue(value, selectedUnit); // Convert the value based on the selected unit
-                  updateCallback(value);
+                  double value = double.tryParse(controller.text) ?? 0.0; // Parse the entered value
+                  if(value == 0.0) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            "${controller.text} no es un formato válido. Introduce un número distinto a 0 en formato XX.XX"),
+                        backgroundColor: Colors.red,
+                        duration: Duration(seconds: 2)));
+                  } else {
+                    value = convertValue(value, selectedUnit); // Convert the value based on the selected unit
+                    updateCallback(value);
+                  }
                   Navigator.of(context).pop();
                 },
               ),

@@ -399,26 +399,34 @@ class _CircuitDesigner2MeshesState extends State<CircuitDesigner2Meshes> {
     if (add) {
       double value = double.tryParse(valueController.text) ??
           0.0; // Default to 0 if parse fails
-      value = CircuitUtils.convertValue(value, selectedUnit);
-      // Add component with value
-      setState(() {
-        if (selectedComponent == SelectedComponent.resistor) {
-          branch.resistors.add(Resistor(adjustedPosition, value));
-          resistors.add(Resistor(adjustedPosition, value));
-        } else if (selectedComponent == SelectedComponent.voltageSource) {
-          int sign = value < 0 ? -1 : 1;
-          branch.voltageSources
-              .add(VoltageSource(adjustedPosition, value.abs(), sign));
-          voltageSources
-              .add(VoltageSource(adjustedPosition, value.abs(), sign));
-        } else {
-          int sign = value < 0 ? -1 : 1;
-          branch.currentSources
-              .add(CurrentSource(adjustedPosition, value.abs(), sign));
-          currentSources
-              .add(CurrentSource(adjustedPosition, value.abs(), sign));
-        }
-      });
+      if(value != 0.0) {
+        value = CircuitUtils.convertValue(value, selectedUnit);
+        // Add component with value
+        setState(() {
+          if (selectedComponent == SelectedComponent.resistor) {
+            branch.resistors.add(Resistor(adjustedPosition, value.abs()));
+            resistors.add(Resistor(adjustedPosition, value.abs()));
+          } else if (selectedComponent == SelectedComponent.voltageSource) {
+            int sign = value < 0 ? -1 : 1;
+            branch.voltageSources
+                .add(VoltageSource(adjustedPosition, value.abs(), sign));
+            voltageSources
+                .add(VoltageSource(adjustedPosition, value.abs(), sign));
+          } else {
+            int sign = value < 0 ? -1 : 1;
+            branch.currentSources
+                .add(CurrentSource(adjustedPosition, value.abs(), sign));
+            currentSources
+                .add(CurrentSource(adjustedPosition, value.abs(), sign));
+          }
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                "${valueController.text} no es un formato válido. Introduce un número distinto a 0 en formato XX.XX"),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2)));
+      }
     }
   }
 
@@ -884,11 +892,11 @@ class CircuitPainter extends CustomPainter {
 
     String valueText = "";
     if (selectedComponent == SelectedComponent.resistor) {
-      valueText = "${(value / 1000).toStringAsFixed(1)} KΩ";
+      valueText = CircuitUtils.formatOhms(value);
     } else if (selectedComponent == SelectedComponent.voltageSource) {
-      valueText = "${(value).toStringAsFixed(1)} V";
+      valueText = CircuitUtils.formatVolts(value);
     } else {
-      valueText = "${(value * 1000).toStringAsFixed(1)} mA";
+      valueText = CircuitUtils.formatAmperes(value);
     }
 
     TextSpan span =

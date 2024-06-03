@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       title: 'ETSIIValente',
       theme: ThemeData(
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.grey).copyWith(background: Colors.white),
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.brown).copyWith(background: Colors.white),
       ),
       home: HomeScreen(),
     );
@@ -110,7 +110,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     SizedBox(height: 10),
                     Text(
-                      'Elige la estructura, diseña, resuelve.',
+                      'Elige la estructura, diseña y resuelve.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                           fontSize: 20,

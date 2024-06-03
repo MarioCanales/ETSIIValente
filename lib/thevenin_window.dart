@@ -1,4 +1,5 @@
 import 'package:ETSIIValente/circuitComponents/TheveninEquivalent.dart';
+import 'package:ETSIIValente/utils/circuitUtils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_color/flutter_color.dart';
 import 'dart:math';
@@ -24,8 +25,8 @@ class _TheveninWindowState extends State<TheveninWindow> {
     bool hasInvalidValues = equivalent.voltage.isNaN || equivalent.voltage.isInfinite ||
         equivalent.resistance.isNaN || equivalent.resistance.isInfinite;
 
-    String theveninText = 'Vth = ${equivalent.voltage.toStringAsFixed(2)} V, Rth = ${(equivalent.resistance / 1000).toStringAsFixed(2)} kΩ';
-    String nortonText = 'In = ${(equivalent.calculateNortonCurrent() * 1000).toStringAsFixed(2)} mA, Rn = ${(equivalent.resistance / 1000).toStringAsFixed(2)} kΩ';
+    String theveninText = 'Vth = ${CircuitUtils.formatVolts(equivalent.voltage)}, Rth = ${CircuitUtils.formatOhms(equivalent.resistance)}';
+    String nortonText = 'In = ${CircuitUtils.formatAmperes(equivalent.calculateNortonCurrent())}, Rn = ${CircuitUtils.formatOhms(equivalent.resistance)}';
 
     return Scaffold(
       appBar: AppBar(
