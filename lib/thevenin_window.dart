@@ -23,7 +23,8 @@ class _TheveninWindowState extends State<TheveninWindow> {
     TheveninEquivalent equivalent = widget.circuit.calculateTheveninEquivalent();
 
     bool hasInvalidValues = equivalent.voltage.isNaN || equivalent.voltage.isInfinite ||
-        equivalent.resistance.isNaN || equivalent.resistance.isInfinite;
+        equivalent.resistance.isNaN || equivalent.resistance.isInfinite ||
+        equivalent.calculateNortonCurrent().isNaN || equivalent.calculateNortonCurrent().isInfinite;
 
     String theveninText = 'Vth = ${CircuitUtils.formatVolts(equivalent.voltage)}, Rth = ${CircuitUtils.formatOhms(equivalent.resistance)}';
     String nortonText = 'In = ${CircuitUtils.formatAmperes(equivalent.calculateNortonCurrent())}, Rn = ${CircuitUtils.formatOhms(equivalent.resistance)}';
