@@ -14,6 +14,11 @@ esta carpeta lib encontraremos clases que se usan dentro de las pantallas:
 - /circuitComponents: Clases que contienen la lógica de las partes del circuito
 - /utils: Clases con funciones que ayudan a la lectura de ficheros y formateo de valores en circuito
 
+## Licencia
+
+Este proyecto está licenciado bajo la Licencia Creative Commons Attribution 4.0
+International. Para más detalles, consulta el archivo [LICENSE](./LICENSE.md).
+
 ## Getting Started - Flutter
 
 This project is a starting point for a Flutter application.
