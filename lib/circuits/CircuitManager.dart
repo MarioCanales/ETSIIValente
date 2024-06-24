@@ -12,7 +12,7 @@ class CircuitStoreWrapper {
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'circuit': circuit.toJson() // Serialize the circuit using its own toJson method
+      'circuit': circuit.toJson() // Serialize the circuit
     };
   }
 
@@ -25,7 +25,7 @@ class CircuitStoreWrapper {
 }
 
 class CircuitManager {
-  // Singleton instance
+  // Singleton instance: factory
   static final CircuitManager _instance = CircuitManager._internal();
   factory CircuitManager() => _instance;
   CircuitManager._internal();
@@ -56,7 +56,7 @@ class CircuitManager {
 
   Future<void> deleteCircuit(String circuitName) async {
     List<CircuitStoreWrapper> circuits = await loadCircuits();
-    // Only delete the first one
+    // Only delete the first one, although there should be only 1 with the name
     int index = circuits.indexWhere((wrapper) => wrapper.name == circuitName);
     if (index != -1) {
       circuits.removeAt(index);

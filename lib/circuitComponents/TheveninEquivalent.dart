@@ -7,6 +7,6 @@ class TheveninEquivalent {
     if(voltage == 0) {
       return 0;
     }
-    return this.voltage/this.resistance;
+    return voltage/resistance;
   }
 }

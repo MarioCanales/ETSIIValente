@@ -33,8 +33,8 @@ class _SavedCircuitsPageState extends State<SavedCircuitsPage> {
           "Circuitos Guardados",
           style: TextStyle(
             color: Colors.brown.darker(30),
-            fontSize: 27, // Tamaño de fuente aumentado
-            fontWeight: FontWeight.bold, // Peso de la fuente más grueso
+            fontSize: 27,
+            fontWeight: FontWeight.bold,
           ),
         ),
         backgroundColor: Colors.white,
@@ -70,7 +70,6 @@ class _SavedCircuitsPageState extends State<SavedCircuitsPage> {
                                   icon: Tooltip(child: Icon(Icons.remove_red_eye, color: Colors.blue), message: "Ver circuito",),
                                   onPressed: () {
                                     Circuit circuit = item.circuit;
-                                    // You can add your edit functionality here
                                     if (circuit is TwoMeshCircuit) {
                                       Navigator.push(
                                               context,

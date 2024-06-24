@@ -40,7 +40,7 @@ class TwoMeshCircuit extends Circuit {
     }
   }
 
-  /// Serialize the circuit to a JSON string.
+  // Serialize the circuit to a JSON string.
   String toJson() {
     return jsonEncode({
       'type': 'TwoMeshCircuit',
@@ -51,7 +51,7 @@ class TwoMeshCircuit extends Circuit {
     });
   }
 
-  /// Deserialize the circuit from a JSON string.
+  // Deserialize the circuit from a JSON string.
   static TwoMeshCircuit fromJson(String json) {
     Map<String, dynamic> map = jsonDecode(json);
     return TwoMeshCircuit.withComponents(

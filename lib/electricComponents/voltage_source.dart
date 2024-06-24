@@ -13,8 +13,8 @@ class VoltageSource extends ElectricComponent {
   void showEditDialog(BuildContext context, Function updateCallback, Function deleteCallback, Function rotateCallback) {
     TextEditingController controller = TextEditingController(text: voltage.toString());
 
-    String selectedUnit = "V"; // Default unit
-    List<String> unitOptions = ["V", "mV"]; // Options for the unit dropdown
+    String selectedUnit = "V";
+    List<String> unitOptions = ["V", "mV"];
 
     showDialog(
         context: context,
@@ -70,7 +70,7 @@ class VoltageSource extends ElectricComponent {
               TextButton(
                 child: Text('Actualizar'),
                 onPressed: () {
-                  double value = double.tryParse(controller.text) ?? 0.0; // Parse the entered value
+                  double value = double.tryParse(controller.text) ?? 0.0; // Parse the value
                   if(value == 0.0) {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
@@ -110,7 +110,6 @@ class VoltageSource extends ElectricComponent {
     return value; // Return as is if already in volts
   }
 
-  // Implement fromJson method
   static VoltageSource fromJson(Map<String, dynamic> json) {
     return VoltageSource(
       Offset(json['position']['dx'], json['position']['dy']),

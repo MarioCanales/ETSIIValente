@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 abstract class ElectricComponent {
   Offset position;
   ElectricComponent(this.position);
-  // TODO: maybe add here draw component with canvas? deal with futures
 
   bool isTapOnComponent(Offset tapPosition, double tolerance) {
     if ((tapPosition - position).distance < tolerance) {
@@ -33,7 +32,7 @@ abstract class ElectricComponent {
             TextButton(
               child: Text("Borrar", style: TextStyle(color: Colors.red)),
               onPressed: () {
-                onConfirm();  // Execute the deletion
+                onConfirm();  // Execute the deletion callback
                 Navigator.of(context).pop();  // Close the confirmation dialog
                 Navigator.of(context).pop();  // Close the edit dialog
               },
@@ -43,7 +42,5 @@ abstract class ElectricComponent {
       },
     );
   }
-
-
 
 }

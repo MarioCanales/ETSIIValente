@@ -7,12 +7,13 @@ import 'FourMeshCircuit.dart';
 import 'TwoMeshCircuit.dart';
 
 abstract class Circuit {
-  // TODO add more common signatures
   TheveninEquivalent calculateTheveninEquivalent();
 
-  // Method to serialize the circuit to a JSON string.
+  // Method to serialize the circuit to a JSON string. To be defined in
+  // Each class
   String toJson();
-  // Method to deserialize
+
+  // Method to deserialize, map to each class static
   static Circuit fromJson(String json) {
     Map<String, dynamic> map = jsonDecode(json);
     String type = map['type'];

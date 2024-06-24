@@ -53,8 +53,8 @@ class HomeScreen extends StatelessWidget {
                     color: Colors.brown.darker(30),
                     fontSize: 36,
                     fontWeight: FontWeight.bold, 
-                    letterSpacing: 1.1, // Espaciado entre letras aumentado
-                    shadows: [ // Sombra para mejorar la legibilidad
+                    letterSpacing: 1.1,
+                    shadows: [
                       Shadow(
                         offset: Offset(0.25, 0.25),
                         blurRadius: 0.25,
@@ -179,7 +179,7 @@ class HomeScreen extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0), // Bordes redondeados
+            borderRadius: BorderRadius.circular(20.0),
           ),
           title: Text('Selecciona el número de mallas', textAlign: TextAlign.center),
           content: Container(

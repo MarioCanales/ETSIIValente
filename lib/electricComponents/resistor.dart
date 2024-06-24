@@ -67,7 +67,7 @@ class Resistor extends ElectricComponent {
               TextButton(
                 child: Text('Actualizar'),
                 onPressed: () {
-                  double value = double.tryParse(controller.text) ?? 0.0; // Parse the entered value
+                  double value = double.tryParse(controller.text) ?? 0.0; // Parse the value
                   if(value == 0.0) {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
@@ -100,7 +100,6 @@ class Resistor extends ElectricComponent {
     return value; // Return as is if already in ohms
   }
 
-  // Implement fromJson method
   static Resistor fromJson(Map<String, dynamic> json) {
     return Resistor(
       Offset(json['position']['dx'], json['position']['dy']),

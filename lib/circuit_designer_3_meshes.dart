@@ -170,8 +170,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
   ThreeMeshCircuit circuit;
 
   _CircuitDesigner3MeshesState(this.circuit);
-  // it makes sense to have a overall list of components though to simplify
-  // Draw features
+  // it makes sense to have a overall list of components to simplify rendering
   List<Resistor> resistors = [];
   List<VoltageSource> voltageSources = [];
   List<CurrentSource> currentSources = [];
@@ -211,7 +210,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
         }
       }
     }
-    return null; // No line is close enough to the tap position
+    return null; // Line is not close enough to the tap position
   }
 
   ElectricComponent? _isTapOnComponent(Offset tapPosition) {
@@ -253,8 +252,6 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
     }
 
     if (closestLine != null) {
-      // Adjust tapPosition to be on the closestLine
-      // For horizontal lines, adjust y; for vertical lines, adjust x
       if (closestLine.start.dy == closestLine.end.dy) {
         // Line is horizontal
         return Offset(tapPosition.dx, closestLine.start.dy);
@@ -264,7 +261,7 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
       }
     }
 
-    return tapPosition; // Return original position if no line is close enough
+    return tapPosition;
   }
 
   void _updateComponentValue(ElectricComponent component, double newValue,
@@ -565,8 +562,8 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
           "Diseña tu circuito",
           style: TextStyle(
             color: Colors.brown.darker(30),
-            fontSize: 25, // Tamaño de fuente aumentado
-            fontWeight: FontWeight.bold, // Peso de la fuente más grueso
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -577,12 +574,12 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
             padding: EdgeInsets.symmetric(vertical: 8),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(10), // Bordes redondeados
+              borderRadius: BorderRadius.circular(10),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black,
                   blurRadius: 4,
-                  offset: Offset(0, 2), // Sombra hacia abajo
+                  offset: Offset(0, 2),
                 ),
               ],
             ),
@@ -688,9 +685,6 @@ class _CircuitDesigner3MeshesState extends State<CircuitDesigner3Meshes> {
                   _isTapOnComponent(details.localPosition);
                   if (selectedComponent == SelectedComponent.edit &&
                       component != null) {
-                    // Edit mode, we need to check if there's a component
-                    // TODO: refine tolerance for this edit method.
-                    // idea: if is not edit, add a +5 in tolerance and vice-versa
                     print("Starting component edit on: ${component}");
                     component.showEditDialog(
                         context,
@@ -817,7 +811,7 @@ class CircuitPainter extends CustomPainter {
     final paint = Paint()
       ..color = Colors.black
       ..strokeWidth = 1.3
-      ..style = PaintingStyle.stroke; // Draw only the outline
+      ..style = PaintingStyle.stroke;
 
     // Define Lines of the circuit
     List<CircuitLine> lines = CircuitParameters.CircuitLines;

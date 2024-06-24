@@ -12,21 +12,21 @@ class CircuitLine {
   }
 
   double distanceToPoint(Offset point) {
-    // Horizontal
+    // Horizontal, fijamos componente y
     if (start.dy == end.dy) {
       if (point.dx >= start.dx && point.dx <= end.dx) {
-        return (point.dy - start.dy).abs(); // Distance is the vertical difference
+        // Coordenada x en el ancho del segmento
+        return (point.dy - start.dy).abs(); // Distancia en vertical
       } else {
-        // Point is outside the horizontal span of the line
+        // Coordenada a la izq o derecha del segmento
         double distanceStart = (point - start).distance;
         double distanceEnd = (point - end).distance;
         return min(distanceStart, distanceEnd);
       }
-    } else { // vertical
+    } else { // vertical, fijamos componente x y misma lógica que arriba
       if (point.dy >= start.dy && point.dy <= end.dy) {
-        return (point.dx - start.dx).abs(); // Distance is the horizontal difference
+        return (point.dx - start.dx).abs();
       } else {
-        // Point is outside the vertical span of the line
         double distanceStart = (point - start).distance;
         double distanceEnd = (point - end).distance;
         return min(distanceStart, distanceEnd);

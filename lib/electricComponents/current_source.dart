@@ -12,8 +12,8 @@ class CurrentSource extends ElectricComponent {
   void showEditDialog(BuildContext context, Function updateCallback, Function deleteCallback, Function rotateCallback) {
     TextEditingController controller = TextEditingController(text: (current*1000).toString());
 
-    String selectedUnit = "mA"; // Default unit
-    List<String> unitOptions = ["mA", "A"]; // Options for the unit dropdown
+    String selectedUnit = "mA"; // Default
+    List<String> unitOptions = ["mA", "A"];
 
     showDialog(
         context: context,
@@ -69,7 +69,7 @@ class CurrentSource extends ElectricComponent {
               TextButton(
                 child: Text('Actualizar'),
                 onPressed: () {
-                  double value = double.tryParse(controller.text) ?? 0.0; // Parse the entered value
+                  double value = double.tryParse(controller.text) ?? 0.0; // Parse the value
                   if(value == 0.0) {
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(

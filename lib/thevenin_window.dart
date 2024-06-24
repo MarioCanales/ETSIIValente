@@ -35,8 +35,8 @@ class _TheveninWindowState extends State<TheveninWindow> {
           showThevenin ? "Equivalente Thevenin" : "Equivalente Norton",
           style: TextStyle(
             color: Colors.brown.darker(30),
-            fontSize: 25, // Tamaño de fuente aumentado
-            fontWeight: FontWeight.bold, // Peso de la fuente más grueso
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),

@@ -59,7 +59,7 @@ class ThreeMeshCircuit extends Circuit {
     }
   }
 
-  /// Serialize the circuit to a JSON string.
+  // Serialize the circuit to a JSON string.
   String toJson() {
     return jsonEncode({
       'type': 'ThreeMeshCircuit',
@@ -73,7 +73,7 @@ class ThreeMeshCircuit extends Circuit {
     });
   }
 
-  /// Deserialize the circuit from a JSON string.
+  // Deserialize the circuit from a JSON string.
   static ThreeMeshCircuit fromJson(String json) {
     Map<String, dynamic> map = jsonDecode(json);
     return ThreeMeshCircuit.withComponents(

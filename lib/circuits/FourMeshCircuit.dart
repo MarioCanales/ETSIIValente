@@ -74,7 +74,7 @@ class FourMeshCircuit extends Circuit {
     }
   }
 
-  /// Serialize the circuit to a JSON string.
+  // Serialize the circuit to a JSON string.
   @override
   String toJson() {
     return jsonEncode({
@@ -92,7 +92,7 @@ class FourMeshCircuit extends Circuit {
     });
   }
 
-  /// Deserialize the circuit from a JSON string.
+  // Deserialize the circuit from a JSON string.
   static FourMeshCircuit fromJson(String json) {
     Map<String, dynamic> map = jsonDecode(json);
     return FourMeshCircuit.withComponents(
